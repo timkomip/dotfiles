@@ -16,9 +16,12 @@ map <Leader>t :!phpunit %<cr>
 
 autocmd Filetype html setlocal ts=4 sts=4 sw=4
 autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
+autocmd Filetype coffee setlocal ts=2 sts=2 sw=2
 autocmd Filetype javascript setlocal ts=4 sts=4 sw=4
 
 nnoremap <leader>ba :w<cr>:! bin/rake<cr>
 nnoremap <silent> + :exe "resize " . (winheight(0) * 3/2)<CR>
 nnoremap <silent> - :exe "resize " . (winheight(0) * 2/3)<CR>
 nmap <silent> <leader>d <Plug>DashSearch
+
+autocmd BufNewFile,BufRead *.blade.php set ft=html | set ft=phtml | set ft=blade " Fix blade auto-indent"
