@@ -1,4 +1,0 @@
-alias edf='vim ~/dotfiles'
-alias art='php artisan'
-alias bake='bin/rake'
-alias bails="bin/rails"
