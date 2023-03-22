@@ -1,0 +1,30 @@
+let mapleader=" "
+
+set scrolloff=5
+set incsearch
+
+Plug 'tpope/vim-surround'
+Plug 'preservim/nerdtree'
+Plug 'tpope/vim-commentary'
+Plug 'machakann/vim-highlightedyank'
+
+
+nnoremap <leader>ns :action NewScratchFile <CR>
+
+nnoremap <leader>ff :action GotoFile<CR>
+nnoremap <leader>fa :action GotoAction<CR>
+nnoremap <S-Space> :action GotoNextError<CR>
+
+nnoremap <leader>gb :action Git.Branches<CR>
+nnoremap <leader>gr :action Vcs.RollbackChangedLines<CR>
+nnoremap <leader>gf :action Git.Fetch<CR>
+
+nnoremap ]g :action VcsShowNextChangeMarker<CR>
+nnoremap [g :action VcsShowPrevChangeMarker<CR>
+nnoremap ]m :action MethodDown<CR>
+nnoremap [m :action MethodUp<CR>
+
+nnoremap <leader>ca :action CloseAllEditors<CR>
+nnoremap <leader>co :action CloseAllEditorsButActive<CR>
+
+nnoremap <leader>t :action ActivateTerminalToolWindow<CR>
