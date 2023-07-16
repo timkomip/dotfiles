@@ -27,4 +27,17 @@ else
       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
+# global gems
+if type "gem" > /dev/null; then
+  # install foobar here
+  gem install gem-ctags
+fi
+
+# rbenv + ruby std lib ctags
+# TODO: install rbenv
+# mkdir -p ~/.rbenv/plugins
+# git clone https://github.com/tpope/rbenv-ctags.git \
+#   ~/.rbenv/plugins/rbenv-ctags
+# rbenv ctags
+
 echo "DONE!!"
