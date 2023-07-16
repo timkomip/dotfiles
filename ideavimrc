@@ -2,14 +2,20 @@ let mapleader=" "
 
 set scrolloff=5
 set incsearch
+set number
+set relativenumber
+set matchpairs
 
 Plug 'tpope/vim-surround'
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-commentary'
 Plug 'machakann/vim-highlightedyank'
+Plug 'chrisbra/matchit'
 
-
+nnoremap <leader>e :NERDTree<CR>
 nnoremap <leader>ns :action NewScratchFile <CR>
+
+nnoremap <leader>b :action ShowNavBar<CR>
 
 nnoremap <leader>ff :action GotoFile<CR>
 nnoremap <leader>fa :action GotoAction<CR>
@@ -18,6 +24,7 @@ nnoremap <S-Space> :action GotoNextError<CR>
 nnoremap <leader>gb :action Git.Branches<CR>
 nnoremap <leader>gr :action Vcs.RollbackChangedLines<CR>
 nnoremap <leader>gf :action Git.Fetch<CR>
+nnoremap <leader>ga :action Annotate<CR>
 
 nnoremap ]g :action VcsShowNextChangeMarker<CR>
 nnoremap [g :action VcsShowPrevChangeMarker<CR>
@@ -26,5 +33,19 @@ nnoremap [m :action MethodUp<CR>
 
 nnoremap <leader>ca :action CloseAllEditors<CR>
 nnoremap <leader>co :action CloseAllEditorsButActive<CR>
+nnoremap <leader>o :action CloseContent<CR>
+
+nnoremap <leader>wa :action HideAllWindows<CR>
 
 nnoremap <leader>t :action ActivateTerminalToolWindow<CR>
+
+nnoremap gh :action ShowErrorDescription <CR>
+nnoremap gt :action GotoTest<CR>
+nnoremap gb :action Back<CR>
+nnoremap gf :action Forward<CR>
+
+nnoremap <leader>ev :e ~/.ideavimrc<CR>
+nnoremap <leader>sv :action IdeaVim.ReloadVimRc.reload<CR>
+
+nnoremap <leader>r :action Run<CR>
+nnoremap <leader>R :action ChooseRunConfiguration<CR>
