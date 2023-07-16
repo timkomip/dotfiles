@@ -55,7 +55,8 @@ Plug 'tpope/vim-surround'
 Plug 'scrooloose/syntastic'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'dense-analysis/ale'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'dense-analysis/ale'
 call plug#end()
 
 " -----------
@@ -97,8 +98,20 @@ augroup end
 " ---
 " ALE
 " ---
-let g:ale_linters = {'ruby': ['standardrb']}
-let g:ale_fixers = {'ruby': ['standardrb']}
-let g:ale_sign_error = '●'
-let g:ale_sign_warning = '.'
+" let g:ale_linters = {'ruby': ['standardrb']}
+" let g:ale_fixers = {'ruby': ['standardrb']}
+" let g:ale_sign_error = '●'
+" let g:ale_sign_warning = '.'
 
+" --------
+" Coc.vim
+" --------
+nnoremap <silent> K :call ShowDocumentation()<CR>
+
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
