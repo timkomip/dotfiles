@@ -84,6 +84,16 @@ nnoremap <leader>fw :Rg<CR>
 nnoremap <leader>ft :Tags<CR>
 nnoremap <leader>fh :History<CR>
 
+" --------
+" vim help
+" --------
+augroup vimhelp
+  autocmd!
+
+  au filetype help nnoremap <buffer> q :q<CR>
+  au filetype help setlocal nonumber
+augroup end
+
 " ---
 " ALE
 " ---
