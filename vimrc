@@ -5,7 +5,6 @@ set nowrap
 set number
 set ruler
 set showmatch
-set cursorline
 set linespace=2
 set laststatus=2
 set showtabline=2
@@ -15,6 +14,7 @@ set switchbuf=useopen
 set relativenumber
 set splitbelow
 set splitright
+set mouse=a
 
 " tab completion
 set wildmenu
@@ -49,6 +49,8 @@ call plug#begin()
 " Plug 'altercation/vim-colors-solarized'
 Plug 'sheerun/vim-polyglot'
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'scrooloose/syntastic'
 Plug 'junegunn/fzf.vim'
@@ -72,8 +74,8 @@ nnoremap <c-j> <c-w>j
 nnoremap <c-k> <c-w>k
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
-nnoremap <leader>ev :vsp $MYVIMRC<cr>
-nnoremap <leader>sv :source $MYVIMRC<cr>
+nnoremap <leader>ev :tabe $MYVIMRC<cr>
+nnoremap <leader>sv :w $MYVIMRC<CR>:source $MYVIMRC<cr>
 nnoremap <leader>pi :PlugInstall<cr>
 nnoremap <leader>o :q<cr>
 nnoremap <leader>ff :Files<CR>

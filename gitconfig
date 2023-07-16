@@ -1,0 +1,11 @@
+[color]
+	ui = true
+[user]
+	email = timkomip@gmail.com
+	name = Michael Timko
+[core]
+	excludesfile = /home/timko/.gitignore_global
+[init]
+	templatedir = ~/.git_template
+[alias]
+	ctags = !.git/hooks/ctags

@@ -2,12 +2,20 @@
 
 VIMRC=~/.vimrc
 
+# ctags 
+if [[ $(uname) == "Darwin" ]]; then
+  brew install --HEAD universal-ctags/universal-ctags/universal-ctags
+else
+  sudo apt install universal-ctags
+fi
+
+
 echo "Linking .vimrc..."
 if [ -L $VIMRC ]; then
   echo "  .vimrc already linked"
 else
   echo "  .vimrc does not exist. Linking..."
-  ln -s vimrc ~/.vimrc
+  ln -s ~/dotfiles/vimrc ~/.vimrc
 fi
 
 echo "Installing vim-plug..."
