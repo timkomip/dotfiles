@@ -56,6 +56,10 @@ Plug 'scrooloose/syntastic'
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'kana/vim-textobj-user'
+Plug 'nelstrom/vim-textobj-rubyblock'
+Plug 'sainnhe/sonokai'
+Plug 'airblade/vim-gitgutter'
 " Plug 'dense-analysis/ale'
 call plug#end()
 
@@ -65,6 +69,14 @@ call plug#end()
 syntax enable
 " set background=dark
 " colorscheme solarized
+
+if has('termguicolors')
+  set termguicolors
+endif
+
+let g:sonokai_style = 'andromeda'
+let g:sonokai_better_performance = 1
+colorscheme sonokai
 
 " --------
 " Mappings
