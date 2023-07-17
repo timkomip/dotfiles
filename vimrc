@@ -48,6 +48,7 @@ filetype plugin on
 call plug#begin()
 " Plug 'altercation/vim-colors-solarized'
 Plug 'sheerun/vim-polyglot'
+Plug 'tpope/vim-rails'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-bundler'
 Plug 'tpope/vim-commentary'
