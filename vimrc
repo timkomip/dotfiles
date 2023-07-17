@@ -60,7 +60,6 @@ Plug 'kana/vim-textobj-user'
 Plug 'nelstrom/vim-textobj-rubyblock'
 Plug 'sainnhe/sonokai'
 Plug 'airblade/vim-gitgutter'
-" Plug 'dense-analysis/ale'
 call plug#end()
 
 " -----------
@@ -118,7 +117,19 @@ augroup end
 " --------
 " Coc.vim
 " --------
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call ShowDocumentation()<CR>
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+augroup coc
+  autocmd!
+
+  autocmd CursorHold * silent call CocActionAsync('highlight')
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
 
 function! ShowDocumentation()
   if CocAction('hasProvider', 'hover')
@@ -127,3 +138,16 @@ function! ShowDocumentation()
     call feedkeys('K', 'in')
   endif
 endfunction
+
+" use <tab> to trigger completion and navigate to the next complete item
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+
+inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
