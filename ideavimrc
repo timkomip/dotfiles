@@ -2,15 +2,22 @@ let mapleader=" "
 
 set scrolloff=5
 set incsearch
+set smartcase
 set number
 set relativenumber
 set matchpairs
+set ideajoin
+set showmode
+set showcmd
 
 Plug 'tpope/vim-surround'
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-commentary'
 Plug 'machakann/vim-highlightedyank'
 Plug 'chrisbra/matchit'
+
+" Use editor back
+nmap <C-o> :action Back<CR>
 
 nnoremap <leader>e :NERDTree<CR>
 nnoremap <leader>ns :action NewScratchFile <CR>
