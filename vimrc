@@ -62,6 +62,12 @@ Plug 'sainnhe/sonokai'
 Plug 'airblade/vim-gitgutter'
 call plug#end()
 
+augroup vimplug 
+  autocmd!
+
+  au filetype vim-plug nnoremap <buffer> q :q<CR>
+augroup end
+
 " -----------
 " colorscheme
 " -----------
