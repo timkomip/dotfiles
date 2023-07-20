@@ -1,5 +1,9 @@
 # timko's dotfiles setup and notes
 
+## Global gems to install
+- gem-browse
+- gem-ctags
+
 ## Neovim
 
 1. Link config/nvim dir to ~/.config/nvim
