@@ -43,7 +43,8 @@ return require('packer').startup(function(use)
     {'L3MON4D3/LuaSnip'},     -- Required
   },
   use('voldikss/vim-floaterm'),
-
-  use("vim-test/vim-test")
+  use("vim-test/vim-test"),
+  use("tpope/vim-bundler"),
+  use {'akinsho/bufferline.nvim', tag = "*", requires = 'nvim-tree/nvim-web-devicons'}
 }
 end)
