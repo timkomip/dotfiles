@@ -56,3 +56,6 @@ nnoremap <leader>sv :action IdeaVim.ReloadVimRc.reload<CR>
 
 nnoremap <leader>r :action Run<CR>
 nnoremap <leader>R :action ChooseRunConfiguration<CR>
+
+nnoremap <leader>hh :action ShowBookmarks<CR>
+nnoremap <leader>ha :action ToggleBookmark<CR>
