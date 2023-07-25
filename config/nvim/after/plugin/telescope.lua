@@ -1,5 +1,4 @@
 local builtin = require('telescope.builtin')
-local wk = require("which-key")
 
 -- WIP
 -- wk.register({ "\\" = { builtin.live_grep, "Find Text" }})

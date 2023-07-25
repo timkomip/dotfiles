@@ -36,3 +36,6 @@ vim.opt.incsearch = true
 
 -- shell
 vim.opt.shell = 'zsh'
+
+-- ctags
+vim.opt.tags = "./tags,tags"

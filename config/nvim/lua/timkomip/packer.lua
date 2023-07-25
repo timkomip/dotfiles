@@ -21,6 +21,7 @@ return require('packer').startup(function(use)
   use('tpope/vim-surround')
   use('tpope/vim-commentary')
   use('tpope/vim-rails')
+  use('vim-ruby/vim-ruby')
 
   -- LSP
   use {
@@ -45,18 +46,6 @@ return require('packer').startup(function(use)
   use('voldikss/vim-floaterm'),
   use("vim-test/vim-test"),
   use("tpope/vim-bundler"),
-  use {'akinsho/bufferline.nvim', tag = "*", requires = 'nvim-tree/nvim-web-devicons'},
-  use {
-    "folke/which-key.nvim",
-    config = function()
-      vim.o.timeout = true
-      vim.o.timeoutlen = 300
-      require("which-key").setup {
-        -- your configuration comes here
-        -- or leave it empty to use the default settings
-        -- refer to the configuration section below
-      }
-    end
-  }
+  use {'akinsho/bufferline.nvim', tag = "*", requires = 'nvim-tree/nvim-web-devicons'}
 }
 end)
