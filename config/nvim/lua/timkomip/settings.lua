@@ -7,8 +7,8 @@ vim.opt.laststatus = 2
 vim.opt.showtabline = 2
 vim.opt.showcmd = true
 vim.opt.cmdheight = 1
-vim.opt.switchbuf= "useopen"
-vim.opt.mouse= "a"
+vim.opt.switchbuf = "useopen"
+vim.opt.mouse = "a"
 vim.opt.autowrite = true
 
 -- fix splits (ugh)
@@ -26,7 +26,7 @@ vim.opt.autoindent = true
 vim.opt.relativenumber = true
 
 -- scroll
-vim.opt.scrolloff=5
+vim.opt.scrolloff = 5
 
 -- search
 vim.opt.hlsearch = true
@@ -39,3 +39,5 @@ vim.opt.shell = 'zsh'
 
 -- ctags
 vim.opt.tags = "./tags,tags"
+
+vim.opt.termguicolors = true

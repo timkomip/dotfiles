@@ -1,18 +1,28 @@
+local telescope = require("telescope")
 local builtin = require('telescope.builtin')
+local extensions = require("telescope").extensions
+local lga_actions = require("telescope-live-grep-args.actions")
 
--- WIP
--- wk.register({ "\\" = { builtin.live_grep, "Find Text" }})
--- wk.register({
---   f = {
---     name = "Find...",
---     f = { "<cmd>builtin.find_files<cr>", "Find Files" },
---     g = { "<cmd>builtin.git_files<cr>", "Find Git Files" },
---     b = { "<cmd>builtin.buffers<cr>", "Find Buffers" },
---     h = { "<cmd>builtin.help_tags<cr>", "Find Vim Help" },
---     t = { "<cmd>builtin.tags<cr>", "Find Tags" },
---     r = { "<cmd>builtin.oldfiles<cr>", "Find Recent" },
---   },
--- }, { prefix = "<leader>" })
+telescope.load_extension("live_grep_args")
+
+telescope.setup {
+  extensions = {
+    live_grep_args = {
+      auto_quoting = true, -- enable/disable auto-quoting
+      -- define mappings, e.g.
+      mappings = {         -- extend mappings
+        i = {
+          ["<C-k>"] = lga_actions.quote_prompt(),
+          ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+        },
+      },
+      -- ... also accepts theme settings, for example:
+      -- theme = "dropdown", -- use dropdown theme
+      -- theme = { }, -- use own theme spec
+      -- layout_config = { mirror=true }, -- mirror preview pane
+    }
+  }
+}
 
 -- find file
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
@@ -21,7 +31,7 @@ vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', builtin.git_files, {})
 
 -- find everywhere
-vim.keymap.set('n', '\\', builtin.live_grep, {})
+vim.keymap.set('n', '\\', extensions.live_grep_args.live_grep_args, {})
 
 -- find buffers
 vim.keymap.set('n', '<leader>fb', builtin.buffers, {})

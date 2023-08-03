@@ -1,12 +1,27 @@
 local lsp = require('lsp-zero').preset({})
+local cmp = require('cmp')
+local builtin = require('telescope.builtin')
+
+-- local cmp_action = require('lsp-zero').cmp_action()
 
 lsp.ensure_installed({
   'tsserver',
   'eslint',
+  'lua_ls',
+  'solargraph',
+  'standardrb'
 })
 
 lsp.on_attach(function(client, bufnr)
   lsp.default_keymaps({ buffer = bufnr })
+
+  -- format
+  vim.keymap.set({ 'n', 'x' }, '<leader>fm', function()
+    vim.lsp.buf.format({ async = false, timeout_ms = 10000 })
+  end, { buffer = bufnr })
+
+  vim.keymap.set('n', 'gr', builtin.lsp_references, { buffer = true })
+  vim.keymap.set('n', '<leader>ds', builtin.lsp_document_symbols, { buffer = true })
 end)
 
 lsp.format_on_save({
@@ -28,9 +43,17 @@ require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
 
 lsp.setup()
 
+-- format on save
+lsp.format_on_save({
+  servers = {
+    ['lua_ls'] = { 'lua' },
+    ['standardrb'] = { 'ruby' },
+  }
+})
+
+
+
 -- You need to setup `cmp` after lsp-zero
-local cmp = require('cmp')
-local cmp_action = require('lsp-zero').cmp_action()
 
 cmp.setup({
   mapping = {
