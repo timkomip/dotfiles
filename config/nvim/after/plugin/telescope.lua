@@ -3,8 +3,6 @@ local builtin = require('telescope.builtin')
 local extensions = require("telescope").extensions
 local lga_actions = require("telescope-live-grep-args.actions")
 
-telescope.load_extension("live_grep_args")
-
 telescope.setup {
   extensions = {
     live_grep_args = {
@@ -14,6 +12,7 @@ telescope.setup {
         i = {
           ["<C-k>"] = lga_actions.quote_prompt(),
           ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+          ["<C-t>"] = lga_actions.quote_prompt({ postfix = " -t" }),
         },
       },
       -- ... also accepts theme settings, for example:
@@ -23,6 +22,8 @@ telescope.setup {
     }
   }
 }
+
+telescope.load_extension("live_grep_args")
 
 -- find file
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
