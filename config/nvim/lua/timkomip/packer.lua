@@ -76,4 +76,5 @@ return require('packer').startup(function(use)
     end,
   })
   use("jremmen/vim-ripgrep")
+  use('klen/nvim-config-local')
 end)
