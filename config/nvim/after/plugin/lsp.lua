@@ -1,6 +1,7 @@
 local lsp = require('lsp-zero').preset({})
 local cmp = require('cmp')
 local builtin = require('telescope.builtin')
+local lspconfig = require('lspconfig')
 
 -- local cmp_action = require('lsp-zero').cmp_action()
 
@@ -24,37 +25,8 @@ lsp.on_attach(function(client, bufnr)
   vim.keymap.set('n', '<leader>ds', builtin.lsp_document_symbols, { buffer = true })
 end)
 
-lsp.format_on_save({
-  format_opts = {
-    async = false,
-    timeout_ms = 10000,
-  },
-  servers = {
-    ['lua_ls'] = { 'lua' },
-    ['standardrb'] = { 'ruby' },
-    -- if you have a working setup with null-ls
-    -- you can specify filetypes it can format.
-    -- ['null-ls'] = {'javascript', 'typescript'},
-  }
-})
-
--- (Optional) Configure lua language server for neovim
-require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
-
+lspconfig.lua_ls.setup(lsp.nvim_lua_ls())
 lsp.setup()
-
--- format on save
-lsp.format_on_save({
-  servers = {
-    ['lua_ls'] = { 'lua' },
-    ['standardrb'] = { 'ruby' },
-  }
-})
-
-
-
--- You need to setup `cmp` after lsp-zero
-
 cmp.setup({
   mapping = {
     -- `Enter` key to confirm completion
@@ -68,3 +40,21 @@ cmp.setup({
     -- ['<C-b>'] = cmp_action.luasnip_jump_backward(),
   }
 })
+
+-- lsp.format_on_save({
+--   format_opts = {
+--     async = false,
+--     timeout_ms = 10000,
+--   },
+--   servers = {
+--     ['lua_ls'] = { 'lua' },
+--     ['standardrb'] = { 'ruby' },
+--     -- if you have a working setup with null-ls
+--     -- you can specify filetypes it can format.
+--     -- ['null-ls'] = {'javascript', 'typescript'},
+--   }
+-- })
+
+-- (Optional) Configure lua language server for neovim
+
+-- You need to setup `cmp` after lsp-zero
