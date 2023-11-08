@@ -61,6 +61,7 @@ Plug 'kana/vim-textobj-user'
 Plug 'nelstrom/vim-textobj-rubyblock'
 Plug 'sainnhe/sonokai'
 Plug 'airblade/vim-gitgutter'
+Plug 'preservim/nerdtree'
 call plug#end()
 
 augroup vimplug 
@@ -93,6 +94,7 @@ nnoremap <c-j> <c-w>j
 nnoremap <c-k> <c-w>k
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
+nnoremap <leader>e :Ex<cr>
 nnoremap <leader>ev :tabe $MYVIMRC<cr>
 nnoremap <leader>sv :w $MYVIMRC<CR>:source $MYVIMRC<cr>
 nnoremap <leader>pi :PlugInstall<cr>
@@ -102,6 +104,10 @@ nnoremap <leader>fg :GFiles<CR>
 nnoremap <leader>fw :Rg<CR>
 nnoremap <leader>ft :Tags<CR>
 nnoremap <leader>fh :History<CR>
+nnoremap <leader>n :NERDTreeFocus<CR>
+nnoremap <C-n> :NERDTree<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
+nnoremap <C-f> :NERDTreeFind<CR>
 
 " --------
 " vim help
@@ -131,6 +137,21 @@ nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call ShowDocumentation()<CR>
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+nmap <leader>rn <Plug>(coc-rename)
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>qf  <Plug>(coc-fix-current)
+" tab
+inoremap <silent><expr> <Tab>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+" shift-tab
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+" enter
+inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
 augroup coc
   autocmd!
 
@@ -152,9 +173,5 @@ function! CheckBackspace() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-inoremap <silent><expr> <Tab>
-      \ coc#pum#visible() ? coc#pum#next(1) :
-      \ CheckBackspace() ? "\<Tab>" :
-      \ coc#refresh()
-
-inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
+command! -nargs=0 Format :call CocActionAsync('format')
+command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
