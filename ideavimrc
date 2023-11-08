@@ -10,11 +10,21 @@ set ideajoin
 set showmode
 set showcmd
 
+" Set Handlers (Shortcut conflicts)
+sethandler <C-A> a:ide
+sethandler <C-F> a:ide
+sethandler <C-N> a:ide
+sethandler <C-S> a:ide
+sethandler <C-V> a:ide
+sethandler <C-X> a:ide
+
+
 Plug 'tpope/vim-surround'
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-commentary'
 Plug 'machakann/vim-highlightedyank'
 Plug 'chrisbra/matchit'
+
 
 " Use editor back
 nmap <C-o> :action Back<CR>
