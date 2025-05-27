@@ -29,6 +29,7 @@ Plug 'chrisbra/matchit'
 " Use editor back
 nmap <C-o> :action Back<CR>
 
+" nnoremap <leader>e :NERDTree<CR>
 nnoremap <leader>e :NERDTree<CR>
 nnoremap <leader>ns :action NewScratchFile <CR>
 
@@ -47,6 +48,8 @@ nnoremap ]g :action VcsShowNextChangeMarker<CR>
 nnoremap [g :action VcsShowPrevChangeMarker<CR>
 nnoremap ]m :action MethodDown<CR>
 nnoremap [m :action MethodUp<CR>
+nnoremap ]e :action GotoNextError<CR>
+nnoremap [e :action GotoPreviousError<CR>
 
 nnoremap <leader>ca :action CloseAllEditors<CR>
 nnoremap <leader>co :action CloseAllEditorsButActive<CR>
@@ -61,8 +64,8 @@ nnoremap gt :action GotoTest<CR>
 nnoremap gb :action Back<CR>
 nnoremap gf :action Forward<CR>
 
-nnoremap <leader>ev :e ~/.ideavimrc<CR>
-nnoremap <leader>sv :action IdeaVim.ReloadVimRc.reload<CR>
+nnoremap <leader>ve :e ~/.ideavimrc<CR>
+nnoremap <leader>vs :action IdeaVim.ReloadVimRc.reload<CR>
 
 nnoremap <leader>r :action Run<CR>
 nnoremap <leader>R :action ChooseRunConfiguration<CR>

@@ -1,16 +1,19 @@
 # timko's dotfiles setup and notes
 
-## Global gems to install
-- gem-browse
-- gem-ctags
+## ZSH Functions
 
-## Neovim
+### teleport
 
-1. Link config/nvim dir to ~/.config/nvim
+```sh
+teleport code # navigate to the ~/code directory from anywhere
+teleport tmp # navigate to the ~/tmp directory from anywhere
+```
 
-2. Install packer.nvim
-```bash
-# clone packer.nvim
-git clone --depth 1 https://github.com/wbthomason/packer.nvim\
- ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+Locations are defined in `~/.teleport.json`. For example:
+
+```json
+{
+  "tmp": "/Users/michael.timko/tmp",
+  "code": "/Users/michael.timko/code"
+}
 ```

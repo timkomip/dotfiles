@@ -1,4 +1,7 @@
 .idea
+.vscode
 projections.json
 tags
+.timko
 .nvim.lua
+.lazy.lua
