@@ -4,6 +4,10 @@
 
 ### teleport
 
+Navigate to a directory from anywhere in the filesystem.
+
+_Requires_ `jq` to be installed.
+
 ```sh
 teleport code # navigate to the ~/code directory from anywhere
 teleport tmp # navigate to the ~/tmp directory from anywhere
