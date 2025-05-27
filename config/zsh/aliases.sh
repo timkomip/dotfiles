@@ -1,0 +1,6 @@
+alias zshconfig="nvim ~/.zshrc"
+alias vimconfig="nvim ~/.config/nvim"
+alias dotconfig="nvim ~/dotfiles"
+alias vim="nvim"
+alias vi="nvim"
+alias t="teleport"
