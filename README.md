@@ -16,6 +16,14 @@ plugins = (
 )
 ```
 
+## Vim?
+
+Clone [timko-vim](https://github.com/timkomip/timko-vim)
+
+```sh
+git clone git@github.com:timkomip/timko-vim.git ~/.config/nvim
+```
+
 ## ZSH Functions
 
 ### teleport
