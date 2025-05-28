@@ -8,19 +8,23 @@ function teleport() {
   DESTINATION=$1
   CONFIG_FILE="$HOME/.teleport.json"
 
+  if ! type "jq" >/dev/null; then
+    echo "Please install jq"
+    return
+  fi
+
   if [ -z "$DESTINATION" ]; then
     echo "Places to go:"
     jq "." "$CONFIG_FILE"
-    exit 0
+    return
   fi
 
-  RESULT=$(jq -r ".$DESTINATION" "$CONFIG_FILE" | tr -d '\r\n')
+  RESULT=$(jq -r ".$DESTINATION" "$CONFIG_FILE" | tr -d '')
 
   if [ -n "$RESULT" ]; then
-    cd "$RESULT" || exit 1
+    cd "$RESULT" || return
   else
     echo "Destination '$DESTINATION' not found in $CONFIG_FILE"
-    exit 1
   fi
 }
 
