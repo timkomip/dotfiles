@@ -1,7 +1,17 @@
 function my-funcs() {
+  echo "cheatsheet - helpful reminders of aliases and stuff"
   echo "teleport - teleport to dir"
   echo "gcol - git checkout local"
   echo "edit-project - interative open in vim (assume ~/code)"
+}
+
+function cheatsheet() {
+  if command -v bat &>/dev/null; then
+    bat "$HOME"/dotfiles/docs/cheatsheet.md
+  else
+    less "$HOME"/dotfiles/docs/cheatsheet.md
+  fi
+
 }
 
 function teleport() {
