@@ -1,0 +1,53 @@
+#!/usr/bin/env zsh
+
+
+function check_programs() {
+  output_file="/tmp/timko-dotfiles-health-output.txt"
+  programs=(
+    bat
+    fzf
+    lazygit
+    nvim
+  )
+
+  echo "Checking for programs that should be installed..."
+  echo ""
+
+  echo "" > $output_file
+
+  for program in $programs; do
+    if command -v "$program" &>/dev/null; then
+      echo "$program,INSTALLED" >> $output_file
+    else
+      echo "$program,NOT INSTALLED" >> $output_file
+    fi
+  done
+
+  cat $output_file | column -t -s ,
+}
+
+function check_links() {
+  output_file="/tmp/timko-dotfiles-health-output.txt"
+  links=(
+    $HOME/.oh-my-zsh/custom/plugins/timko
+  )
+
+  echo "Checking for sym links..."
+  echo ""
+
+  echo "" > $output_file
+
+  for link in $links; do
+    if [ -h $link ] && [ -h "$link" ]; then
+      echo "$link,LINKED" >> $output_file
+    else
+      echo "$link,NO LINK" >> $output_file
+    fi
+  done
+
+  cat $output_file | column -t -s ,
+}
+
+check_programs
+echo ""
+check_links
