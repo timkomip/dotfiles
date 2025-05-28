@@ -1,5 +1,21 @@
 # timko's dotfiles setup and notes
 
+## Install (via oh my zsh)
+
+```sh
+ln -s ~/dotfiles/oh-my-zsh/plugins/timko ~/.oh-my-zsh/custom/plugins/timko
+
+```
+
+Then enable plugin in .zshrc
+
+```sh
+plugins = (
+  git
+  timko
+)
+```
+
 ## ZSH Functions
 
 ### teleport
