@@ -9,6 +9,7 @@ set matchpairs
 set ideajoin
 set showmode
 set showcmd
+set hlsearch
 
 " Set Handlers (Shortcut conflicts)
 sethandler <C-A> a:ide
@@ -26,17 +27,21 @@ Plug 'machakann/vim-highlightedyank'
 Plug 'chrisbra/matchit'
 
 
+" search
+nmap <esc> :nohlsearch<CR>
+
 " Use editor back
 nmap <C-o> :action Back<CR>
+nmap <C-i> :action Forward<CR>
 
 " nnoremap <leader>e :NERDTree<CR>
 nnoremap <leader>e :NERDTree<CR>
 nnoremap <leader>ns :action NewScratchFile <CR>
 
-nnoremap <leader>b :action ShowNavBar<CR>
-
 nnoremap <leader>ff :action GotoFile<CR>
 nnoremap <leader>fa :action GotoAction<CR>
+nnoremap <leader>fr :action RecentFiles<CR>
+nnoremap <leader>fp :action RecentProjectListGroup<CR>
 nnoremap <S-Space> :action GotoNextError<CR>
 
 nnoremap <leader>gb :action Git.Branches<CR>
@@ -50,15 +55,25 @@ nnoremap ]m :action MethodDown<CR>
 nnoremap [m :action MethodUp<CR>
 nnoremap ]e :action GotoNextError<CR>
 nnoremap [e :action GotoPreviousError<CR>
+nnoremap ]b :action NextTab<CR>
+nnoremap [b :action PreviousTab<CR>
 
-nnoremap <leader>ca :action CloseAllEditors<CR>
-nnoremap <leader>co :action CloseAllEditorsButActive<CR>
-nnoremap <leader>o :action CloseContent<CR>
+nnoremap <leader>ba :action CloseAllEditors<CR>
+nnoremap <leader>bo :action CloseAllEditorsButActive<CR>
+nnoremap <leader>bd :action CloseContent<CR>
+nnoremap <leader>bb :action Switcher<CR>
+nnoremap <leader>b1 :action GoToTab1<CR>
+nnoremap <leader>b2 :action GoToTab2<CR>
+nnoremap <leader>b3 :action GoToTab3<CR>
+nnoremap <leader>b4 :action GoToTab4<CR>
+nnoremap <leader>b5 :action GoToTab5<CR>
+nnoremap <leader>b6 :action GoToTab6<CR>
 
 nnoremap <leader>wa :action HideAllWindows<CR>
 
 nnoremap <leader>t :action ActivateTerminalToolWindow<CR>
 
+nnoremap gc :action ActivateCommitToolWindow<CR>
 nnoremap gh :action ShowErrorDescription <CR>
 nnoremap gt :action GotoTest<CR>
 nnoremap gb :action Back<CR>
