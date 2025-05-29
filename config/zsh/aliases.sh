@@ -1,5 +1,6 @@
 alias r!="omz reload"
 alias zshconfig="nvim ~/.zshrc"
+alias nvimconfig="nvim ~/.config/nvim"
 alias vimconfig="nvim ~/.config/nvim"
 alias dotconfig="nvim ~/dotfiles"
 alias editcs="nvim ~/dotfiles/docs/cheatsheet.md"
