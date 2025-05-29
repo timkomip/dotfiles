@@ -10,10 +10,13 @@ set ideajoin
 set showmode
 set showcmd
 set hlsearch
+" which-key requires plugin (via JetBrains Marketplace)
+set which-key
+set notimeout
 
 " Set Handlers (Shortcut conflicts)
 sethandler <C-A> a:ide
-sethandler <C-F> a:ide
+sethandler <C-F> a:vim
 sethandler <C-N> a:ide
 sethandler <C-S> a:ide
 sethandler <C-V> a:ide
@@ -26,7 +29,6 @@ Plug 'tpope/vim-commentary'
 Plug 'machakann/vim-highlightedyank'
 Plug 'chrisbra/matchit'
 
-
 " search
 nmap <esc> :nohlsearch<CR>
 
@@ -35,15 +37,20 @@ nmap <C-o> :action Back<CR>
 nmap <C-i> :action Forward<CR>
 
 " nnoremap <leader>e :NERDTree<CR>
+let g:WhichKeyDesc_nerdtree = "<leader>e  Open NERDTree/Explorer"
 nnoremap <leader>e :NERDTree<CR>
+
+let g:WhichKeyDesc_new_prefix = "<leader>n  New"
 nnoremap <leader>ns :action NewScratchFile <CR>
 
+let g:WhichKeyDesc_file_find_prefix = "<leader>f  File/Find"
 nnoremap <leader>ff :action GotoFile<CR>
 nnoremap <leader>fa :action GotoAction<CR>
 nnoremap <leader>fr :action RecentFiles<CR>
 nnoremap <leader>fp :action RecentProjectListGroup<CR>
 nnoremap <S-Space> :action GotoNextError<CR>
 
+let g:WhichKeyDesc_git_prefix = "<leader>g  Git"
 nnoremap <leader>gb :action Git.Branches<CR>
 nnoremap <leader>gr :action Vcs.RollbackChangedLines<CR>
 nnoremap <leader>gf :action Git.Fetch<CR>
@@ -58,6 +65,7 @@ nnoremap [e :action GotoPreviousError<CR>
 nnoremap ]b :action NextTab<CR>
 nnoremap [b :action PreviousTab<CR>
 
+let g:WhichKeyDesc_buffer_prefix = "<leader>b  Buffers/Editors"
 nnoremap <leader>ba :action CloseAllEditors<CR>
 nnoremap <leader>bo :action CloseAllEditorsButActive<CR>
 nnoremap <leader>bd :action CloseContent<CR>
@@ -79,11 +87,15 @@ nnoremap gt :action GotoTest<CR>
 nnoremap gb :action Back<CR>
 nnoremap gf :action Forward<CR>
 
+let g:WhichKeyDesc_vimrc_prefix = "<leader>v  ideavimrc"
 nnoremap <leader>ve :e ~/.ideavimrc<CR>
 nnoremap <leader>vs :action IdeaVim.ReloadVimRc.reload<CR>
 
 nnoremap <leader>r :action Run<CR>
 nnoremap <leader>R :action ChooseRunConfiguration<CR>
 
+let g:WhichKeyDesc_harpoon_prefix = "<leader>h  Bookmarks/Harpoon"
 nnoremap <leader>hh :action ShowBookmarks<CR>
 nnoremap <leader>ha :action ToggleBookmark<CR>
+
+nnoremap <leader>: :action GotoAction<CR>
