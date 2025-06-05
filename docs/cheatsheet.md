@@ -3,6 +3,9 @@
 ## Git
 
 ```sh
+# rebase
+grbom # git rebase origin/main
+
 # stash
 gstp # git stash pop
 gstp # git stash push
