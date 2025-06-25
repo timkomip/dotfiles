@@ -1,5 +1,11 @@
 # Cheatsheet
 
+## General
+
+```sh
+md # mkdir -p
+```
+
 ## Git
 
 ```sh
