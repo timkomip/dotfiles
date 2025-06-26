@@ -1,0 +1,7 @@
+[
+  {
+    "key": "ctrl+j",
+    "command": "search.action.focusSearchList",
+    "when": "!listFocus && searchViewletVisible && inputFocus"
+  }
+]
