@@ -3,7 +3,7 @@
 ## Install (via oh my zsh)
 
 ```sh
-ln -s ~/dotfiles/oh-my-zsh/plugins/timko ~/.oh-my-zsh/custom/plugins/timko
+ln -s ~/dotfiles/oh-my-zsh/custom/plugins/timko ~/.oh-my-zsh/custom/plugins/timko
 
 ```
 
