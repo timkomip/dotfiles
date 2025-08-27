@@ -39,7 +39,11 @@ function teleport() {
 }
 
 function gcol() {
-  git checkout "$(git branch --format='%(refname:short)' | fzf)"
+  git branch --format='%(refname:short)' | fzf --no-multi | xargs git checkout
+}
+
+function gcoi() {
+  _fzf_git_each_ref --no-multi | xargs git checkout
 }
 
 function edit-project() {
@@ -50,4 +54,8 @@ function edit-project() {
   else
     nvim ~/code/"$passed_project"
   fi
+}
+
+function mkfile() {
+  mkdir -p -- "$1" && touch -- "$1"/"$2"
 }
