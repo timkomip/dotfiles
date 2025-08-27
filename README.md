@@ -47,11 +47,20 @@ git clone git@github.com:timkomip/timko-vim.git ~/.config/nvim
 
 Navigate to a directory from anywhere in the filesystem.
 
-_Requires_ `jq` to be installed.
+There are two versions.
+
+- yaml_teleport - uses yaml config
+- json_teleport - use json config
+
+_Requires_ `jq` or `yq` to be installed.
 
 ```sh
-teleport code # navigate to the ~/code directory from anywhere
-teleport tmp # navigate to the ~/tmp directory from anywhere
+yaml_teleport code # navigate to the ~/code directory from anywhere
+yaml_teleport tmp # navigate to the ~/tmp directory from anywhere
+
+# aliased as t
+t code
+t tmp
 ```
 
 Locations are defined in `~/.teleport.json`. For example:
@@ -61,4 +70,10 @@ Locations are defined in `~/.teleport.json`. For example:
   "tmp": "/Users/michael.timko/tmp",
   "code": "/Users/michael.timko/code"
 }
+```
+
+```yaml
+places:
+  tmp: /Users/michael.timko/tmp
+  code: /Users/michael.timko/code
 ```

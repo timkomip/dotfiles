@@ -14,7 +14,7 @@ function cheatsheet() {
 
 }
 
-function teleport() {
+function json_teleport() {
   DESTINATION=$1
   CONFIG_FILE="$HOME/.teleport.json"
 
@@ -32,6 +32,30 @@ function teleport() {
   RESULT=$(jq -r ".$DESTINATION" "$CONFIG_FILE" | tr -d '')
 
   if [ -n "$RESULT" ]; then
+    cd "$RESULT" || return
+  else
+    echo "Destination '$DESTINATION' not found in $CONFIG_FILE"
+  fi
+}
+
+function yaml_teleport() {
+  DESTINATION=$1
+  CONFIG_FILE="$HOME/.teleport.yaml"
+
+  if ! type "yq" >/dev/null; then
+    echo "Please install yq"
+    return
+  fi
+
+  if [ -z "$DESTINATION" ]; then
+    echo "Places to go:"
+    yq eval "." "$CONFIG_FILE"
+    return
+  fi
+
+  RESULT=$(yq eval ".places.$DESTINATION" "$CONFIG_FILE")
+
+  if [ "$RESULT" != "null" ]; then
     cd "$RESULT" || return
   else
     echo "Destination '$DESTINATION' not found in $CONFIG_FILE"
