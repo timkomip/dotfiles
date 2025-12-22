@@ -10,7 +10,6 @@ ZSH_CONFIG_DIR="$DOTFILES_DIR/config/zsh"
 typeset -a config_files
 config_files=(
   ohmyzsh.zsh
-  plugins.zsh
   fzf.sh
   paths.sh
   functions.sh

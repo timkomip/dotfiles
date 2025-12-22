@@ -61,8 +61,7 @@ Show help message with available commands.
 ```
 dotfiles/
 ├── bin/
-│   ├── dotty              # Main dotfiles management command
-│   └── dotfiles-health    # Health check script
+│   └── dotty              # Main dotfiles management command
 ├── bootstrap.sh           # Entry point for loading zsh config
 ├── config/
 │   ├── Brewfile           # Homebrew packages to install
@@ -77,9 +76,8 @@ dotfiles/
 │   └── zsh/               # Zsh configuration files
 │       ├── aliases.sh     # Shell aliases
 │       ├── functions.sh   # Custom shell functions
-│       ├── fzf.sh         # FZF configuration
-│       ├── paths.sh       # PATH modifications
-│       └── plugins.zsh    # Plugin loading
+│       ├── fzf.sh         # FZF configuration (also loads fzf-git plugin)
+│       └── paths.sh       # PATH modifications
 └── docs/
     ├── cheatsheet.md      # Quick reference
     └── vscode.md          # VSCode notes
@@ -90,8 +88,8 @@ dotfiles/
 ### Zsh Configuration
 
 The `bootstrap.sh` script loads configuration files from `config/zsh/` in this order:
-1. `plugins.zsh` - Loads external plugins (e.g., fzf-git)
-2. `fzf.sh` - FZF environment variables and options
+1. `ohmyzsh.zsh` - oh-my-zsh theme and plugins configuration
+2. `fzf.sh` - FZF environment variables and options (also loads fzf-git plugin)
 3. `paths.sh` - PATH modifications
 4. `functions.sh` - Custom shell functions
 5. `aliases.sh` - Shell aliases
@@ -109,7 +107,7 @@ links:
   - from: ~/dotfiles/config/ideavimrc
     to: ~/.ideavimrc
   - from: ~/dotfiles/config/git/gitignore_global
-    to: ~/.gitignore_global
+    to: ~/.gitignore
 ```
 
 Run `dotty links` to create all symlinks.
@@ -153,7 +151,6 @@ places:
 - `cheatsheet` - View the cheatsheet (aliased as `chtsht`)
 - `gcol` - Git checkout local branch (interactive with fzf)
 - `gcoi` - Git checkout interactive (includes remotes)
-- `edit-project` - Open a project from `~/code` in nvim
 
 ## ZSH Plugins
 
