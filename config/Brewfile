@@ -1,0 +1,5 @@
+# Homebrew packages
+brew "mise"
+brew "jq"
+brew "yq"
+
