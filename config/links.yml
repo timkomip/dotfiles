@@ -2,4 +2,7 @@ links:
   - from: ~/dotfiles/config/ideavimrc
     to: ~/.ideavimrc
   - from: ~/dotfiles/config/git/gitignore_global
-    to: ~/.gitignore_global
+    to: ~/.gitignore
+  - from: ~/dotfiles/config/teleport.yaml
+    to: ~/.teleport.yaml
+
