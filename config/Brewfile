@@ -1,4 +1,9 @@
 # Homebrew packages
+brew "fzf"
+brew "gh"
+brew "htop"
+brew "bat"
+brew "lazygit"
 brew "mise"
 brew "jq"
 brew "yq"
