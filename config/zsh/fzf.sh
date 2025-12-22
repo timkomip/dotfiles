@@ -14,3 +14,11 @@ export FZF_CTRL_R_OPTS="
 export FZF_ALT_C_OPTS="
   --walker-skip .git,node_modules,target
   --preview 'tree -C {}'"
+
+# Source fzf-git.sh from vendor directory
+local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
+local fzf_git_script="$dotfiles_dir/vendor/fzf-git.sh/fzf-git.sh"
+
+if [ -f "$fzf_git_script" ]; then
+  source "$fzf_git_script"
+fi
