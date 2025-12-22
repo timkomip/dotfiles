@@ -1,0 +1,5 @@
+places:
+  tmp: /Users/timko/tmp
+  nvim: /Users/timko/.config/nvim
+  dotfiles: /Users/timko/dotfiles
+  code: /Users/timko/code
