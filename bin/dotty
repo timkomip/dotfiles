@@ -12,7 +12,7 @@ USAGE:
     dotty [COMMAND]
 
 COMMANDS:
-    init        Initialize dotfiles (zshrc, brew, links)
+    init        Initialize dotfiles (zshrc, oh-my-zsh, brew, links)
     brew        Install Homebrew and packages from Brewfile
     links       Create symlinks from links.yml
     help        Show this help message
@@ -23,7 +23,7 @@ EOF
 
 function init_dotfiles() {
   local zshrc="$HOME/.zshrc"
-  local dotfiles_dir="$HOME/dotfiles"
+  local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
   local source_line="source $dotfiles_dir/bootstrap.sh"
 
   if [ ! -f "$zshrc" ]; then
@@ -33,16 +33,32 @@ function init_dotfiles() {
 
   # Check if the source line already exists
   if grep -Fxq "$source_line" "$zshrc" 2>/dev/null; then
-    echo "Dotfiles are already initialized in ~/.zshrc"
+    echo "✓ Dotfiles are already initialized in ~/.zshrc"
     return 0
   fi
 
-  # Append the source line
-  echo "" >> "$zshrc"
-  echo "# Load dotfiles" >> "$zshrc"
-  echo "$source_line" >> "$zshrc"
-  echo "Added dotfiles initialization to ~/.zshrc"
-  echo "Run 'source ~/.zshrc' or restart your terminal to apply changes."
+  # Print instructions for manual insertion
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "  ACTION REQUIRED: Add dotfiles to ~/.zshrc"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  echo "  Add the following lines to ~/.zshrc:"
+  echo "  (Place them AFTER 'export ZSH=' and BEFORE 'source \$ZSH/oh-my-zsh.sh')"
+  echo ""
+  echo "  # Load dotfiles (sets oh-my-zsh theme and plugins)"
+  echo "  $source_line"
+  echo ""
+  echo "  Example location in ~/.zshrc:"
+  echo "    export ZSH=\"\$HOME/.oh-my-zsh\""
+  echo ""
+  echo "    # Load dotfiles (sets oh-my-zsh theme and plugins)"
+  echo "    $source_line"
+  echo ""
+  echo "    source \$ZSH/oh-my-zsh.sh"
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
 }
 
 function init_brew() {
@@ -76,6 +92,28 @@ function init_brew() {
     brew bundle --file="$brewfile"
   else
     echo "Warning: Brewfile not found at $brewfile" >&2
+  fi
+}
+
+function init_ohmyzsh() {
+  local ohmyzsh_dir="$HOME/.oh-my-zsh"
+
+  # Check if oh-my-zsh is already installed
+  if [ -d "$ohmyzsh_dir" ]; then
+    echo "oh-my-zsh is already installed at $ohmyzsh_dir"
+    return 0
+  fi
+
+  # Install oh-my-zsh
+  echo "Installing oh-my-zsh..."
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  
+  # Verify installation
+  if [ -d "$ohmyzsh_dir" ]; then
+    echo "oh-my-zsh installed successfully"
+  else
+    echo "Warning: oh-my-zsh installation may have failed" >&2
+    return 1
   fi
 }
 
@@ -150,6 +188,7 @@ function sync_links() {
 
 function init() {
   init_dotfiles
+  init_ohmyzsh
   init_brew
   sync_links
 }

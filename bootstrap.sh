@@ -9,6 +9,7 @@ ZSH_CONFIG_DIR="$DOTFILES_DIR/config/zsh"
 # Array of config files to source (in order)
 typeset -a config_files
 config_files=(
+  ohmyzsh.zsh
   plugins.zsh
   fzf.sh
   paths.sh
