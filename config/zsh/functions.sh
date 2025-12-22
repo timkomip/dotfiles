@@ -97,17 +97,57 @@ function gcoi() {
 
 # Open a project from ~/code directory using $EDITOR
 # Usage: edit-project [project_name]
-#   - If no project name provided, opens fzf to select from ~/code
+#   - If no project name provided, opens fzf to interactively select from ~/code
 #   - If project name provided, directly opens ~/code/project_name
 #   - Uses $EDITOR environment variable (defaults to nvim if not set)
+#   - Validates project names to prevent path traversal attacks
+#   - Returns error if ~/code directory doesn't exist
+#   - Returns error if specified project doesn't exist
+# Examples:
+#   edit-project              # Interactive selection with fzf
+#   edit-project my-app       # Open ~/code/my-app
+#   EDITOR=code edit-project web  # Open ~/code/web in VS Code
 function edit-project() {
   local passed_project=$1
   local editor="${EDITOR:-nvim}"
+  local code_dir="$HOME/code"
+
+  # Validate that ~/code directory exists
+  if [ ! -d "$code_dir" ]; then
+    echo "Error: $code_dir does not exist" >&2
+    return 1
+  fi
 
   if [ -z "$passed_project" ]; then
-    $editor ~/code/"$(ls ~/code | fzf)"
+    # Interactive mode: use fzf to select project
+    local selected=$(ls "$code_dir" | fzf)
+    if [ -z "$selected" ]; then
+      # User cancelled fzf selection
+      return 1
+    fi
+    # Validate selected project name (prevent path traversal attacks)
+    if [[ "$selected" =~ \.\./ ]] || [[ "$selected" =~ ^/ ]]; then
+      echo "Error: Invalid project name" >&2
+      return 1
+    fi
+    # Open selected project using basename to sanitize path
+    $editor "$code_dir/$(basename "$selected")"
   else
-    $editor ~/code/"$passed_project"
+    # Direct mode: open specified project
+    # Validate project name (prevent path traversal attacks)
+    if [[ "$passed_project" =~ \.\./ ]] || [[ "$passed_project" =~ ^/ ]]; then
+      echo "Error: Invalid project name. Use only the project directory name." >&2
+      return 1
+    fi
+    # Use basename to prevent any path manipulation
+    local project_name=$(basename "$passed_project")
+    local project_path="$code_dir/$project_name"
+    # Check if project exists before opening
+    if [ ! -e "$project_path" ]; then
+      echo "Error: Project '$project_name' does not exist in $code_dir" >&2
+      return 1
+    fi
+    $editor "$project_path"
   fi
 }
 
@@ -117,5 +157,23 @@ function edit-project() {
 #   - Creates the file inside the directory
 # Example: mkfile path/to/dir file.txt
 function mkfile() {
-  mkdir -p -- "$1" && touch -- "$1"/"$2"
+  if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "Error: mkfile requires both directory path and filename" >&2
+    echo "Usage: mkfile <directory_path> <filename>" >&2
+    return 1
+  fi
+
+  local dir_path="$1"
+  local filename="$2"
+
+  # Validate filename (prevent path traversal in filename)
+  if [[ "$filename" =~ \.\./ ]] || [[ "$filename" =~ / ]]; then
+    echo "Error: Filename cannot contain path separators or '..'" >&2
+    return 1
+  fi
+
+  # Use basename on filename to ensure it's just a filename
+  local safe_filename=$(basename "$filename")
+
+  mkdir -p -- "$dir_path" && touch -- "$dir_path"/"$safe_filename"
 }
