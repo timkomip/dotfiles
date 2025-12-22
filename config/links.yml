@@ -1,0 +1,5 @@
+links:
+  - from: ~/dotfiles/config/ideavimrc
+    to: ~/.ideavimrc
+  - from: ~/dotfiles/config/git/gitignore_global
+    to: ~/.gitignore_global
