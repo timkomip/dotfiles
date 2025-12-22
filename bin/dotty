@@ -1,0 +1,168 @@
+#!/usr/bin/env zsh
+
+function show_help() {
+  cat <<EOF
+dotty - Manage dotfiles
+
+USAGE:
+    dotty [COMMAND]
+
+COMMANDS:
+    init        Initialize dotfiles (zshrc, brew, links)
+    brew        Install Homebrew and packages from Brewfile
+    links       Create symlinks from links.yml
+    help        Show this help message
+
+For more information, visit: ~/dotfiles
+EOF
+}
+
+function init_dotfiles() {
+  local zshrc="$HOME/.zshrc"
+  local dotfiles_dir="$HOME/dotfiles"
+  local source_line="source $dotfiles_dir/bootstrap.sh"
+
+  if [ ! -f "$zshrc" ]; then
+    echo "Error: ~/.zshrc does not exist"
+    exit 1
+  fi
+
+  # Check if the source line already exists
+  if grep -Fxq "$source_line" "$zshrc" 2>/dev/null; then
+    echo "Dotfiles are already initialized in ~/.zshrc"
+    return 0
+  fi
+
+  # Append the source line
+  echo "" >> "$zshrc"
+  echo "# Load dotfiles" >> "$zshrc"
+  echo "$source_line" >> "$zshrc"
+  echo "Added dotfiles initialization to ~/.zshrc"
+  echo "Run 'source ~/.zshrc' or restart your terminal to apply changes."
+}
+
+function init_brew() {
+  local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
+  local brewfile="$dotfiles_dir/config/Brewfile"
+
+  # Check if Homebrew is installed
+  if ! command -v brew &>/dev/null; then
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Add Homebrew to PATH for Apple Silicon Macs
+    if [[ -f "/opt/homebrew/bin/brew" ]]; then
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [[ -f "/usr/local/bin/brew" ]]; then
+      eval "$(/usr/local/bin/brew shellenv)"
+    fi
+  else
+    echo "Homebrew is already installed"
+  fi
+
+  # Install packages from Brewfile
+  if [ -f "$brewfile" ]; then
+    echo "Installing packages from Brewfile..."
+    brew bundle --file="$brewfile"
+  else
+    echo "Warning: Brewfile not found at $brewfile" >&2
+  fi
+}
+
+function sync_links() {
+  local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
+  local links_file="$dotfiles_dir/config/links.yml"
+
+  # Check if yq is installed
+  if ! command -v yq &>/dev/null; then
+    echo "Error: yq is required but not installed. Run 'dotty brew' first." >&2
+    exit 1
+  fi
+
+  # Check if links.yml exists
+  if [ ! -f "$links_file" ]; then
+    echo "Warning: links.yml not found at $links_file" >&2
+    return 1
+  fi
+
+  # Parse YAML and create symlinks
+  local count=$(yq eval '.links | length' "$links_file")
+  
+  if [ "$count" -eq 0 ]; then
+    echo "No links found in $links_file"
+    return 0
+  fi
+
+  echo "Creating symlinks from $links_file..."
+
+  for ((i=0; i<count; i++)); do
+    local from=$(yq eval ".links[$i].from" "$links_file")
+    local to=$(yq eval ".links[$i].to" "$links_file")
+
+    # Expand ~ to $HOME
+    from="${from/#\~/$HOME}"
+    to="${to/#\~/$HOME}"
+
+    # Check if source exists
+    if [ ! -e "$from" ]; then
+      echo "Warning: Source does not exist: $from" >&2
+      continue
+    fi
+
+    # Check if destination already exists
+    if [ -e "$to" ]; then
+      if [ -L "$to" ]; then
+        local current_target=$(readlink "$to")
+        if [ "$current_target" = "$from" ]; then
+          echo "  ✓ Symlink already exists: $to -> $from"
+          continue
+        else
+          echo "  ⚠ Symlink exists but points elsewhere: $to -> $current_target"
+          continue
+        fi
+      else
+        echo "  ⚠ File/directory already exists (not a symlink): $to"
+        continue
+      fi
+    fi
+
+    # Create parent directory if needed
+    local to_dir=$(dirname "$to")
+    if [ ! -d "$to_dir" ]; then
+      mkdir -p "$to_dir"
+    fi
+
+    # Create symlink
+    ln -s "$from" "$to"
+    echo "  ✓ Created symlink: $to -> $from"
+  done
+}
+
+function init() {
+  init_dotfiles
+  init_brew
+  sync_links
+}
+
+# Main command handler
+case "${1:-help}" in
+  init)
+    init
+    ;;
+  brew)
+    init_brew
+    ;;
+  links)
+    sync_links
+    ;;
+  help|--help|-h)
+    show_help
+    ;;
+  *)
+    echo "Error: Unknown command '$1'"
+    echo ""
+    show_help
+    exit 1
+    ;;
+esac
+
