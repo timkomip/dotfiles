@@ -6,9 +6,11 @@ A dotfiles management system with automated setup and configuration.
 
 This repository contains my personal dotfiles and a management tool (`dotty`) that automates:
 - Initializing dotfiles in your shell configuration
-- Installing Homebrew and required packages
+- Installing Homebrew and required packages (macOS only)
 - Creating symlinks for configuration files
 - Loading zsh configuration files in a structured way
+
+> **Note:** Homebrew installation is only available on macOS. On other platforms, the brew-related commands will be skipped with a warning. Linux support may be added in the future.
 
 ## Quick Start
 
@@ -24,8 +26,8 @@ git clone <repo-url> ~/dotfiles
 
 This will:
 - Add the bootstrap script to your `~/.zshrc`
-- Install Homebrew (if not already installed)
-- Install packages from `config/Brewfile` (including `yq`)
+- Install Homebrew (if not already installed) - **macOS only**
+- Install packages from `config/Brewfile` (including `yq`) - **macOS only**
 - Create symlinks from `config/links.yml`
 
 3. Reload your shell:
@@ -41,7 +43,8 @@ The `dotty` command provides several subcommands:
 Initialize everything: add bootstrap to zshrc, install brew packages, and create symlinks.
 
 ### `dotty brew`
-Install Homebrew (if needed) and install packages from `config/Brewfile`.
+Install Homebrew (if needed) and install packages from `config/Brewfile`.  
+**Note:** This command only works on macOS. On other platforms, it will display a warning and skip brew operations.
 
 ### `dotty links`
 Create symlinks from `config/links.yml`. This command:
