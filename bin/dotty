@@ -230,12 +230,32 @@ function sync_links() {
   done
 }
 
+function print_section() {
+  local title="$1"
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "  $title"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+}
+
 function init() {
+  print_section "STEP 1: Initialize Dotfiles Configuration"
   init_dotfiles
+  
+  print_section "STEP 2: Install oh-my-zsh"
   init_ohmyzsh
+  
+  print_section "STEP 3: Install Homebrew and Packages"
   init_brew
+  
+  print_section "STEP 4: Clone Vendor Dependencies"
   init_vendor
+  
+  print_section "STEP 5: Create Symlinks"
   sync_links
+  
+  print_section "✓ Initialization complete!"
 }
 
 # Main command handler
