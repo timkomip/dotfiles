@@ -1,0 +1,48 @@
+# =============================================================================
+# zshrc — main shell configuration
+# Symlinked to ~/.zshrc via dotty
+# =============================================================================
+
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+ZSH_CONFIG_DIR="$DOTFILES_DIR/config/zsh"
+
+# -----------------------------------------------------------------------------
+# Oh My Zsh
+# -----------------------------------------------------------------------------
+export ZSH="$HOME/.oh-my-zsh"
+
+source "$ZSH_CONFIG_DIR/ohmyzsh.zsh"   # theme + plugins (must precede oh-my-zsh.sh)
+source "$ZSH/oh-my-zsh.sh"
+
+# -----------------------------------------------------------------------------
+# Dotfiles modules
+# -----------------------------------------------------------------------------
+source "$ZSH_CONFIG_DIR/paths.sh"
+source "$ZSH_CONFIG_DIR/fzf.sh"
+source "$ZSH_CONFIG_DIR/functions.sh"
+source "$ZSH_CONFIG_DIR/aliases.sh"
+
+# -----------------------------------------------------------------------------
+# Environment
+# -----------------------------------------------------------------------------
+export EDITOR='nvim'
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+eval "$(mise activate zsh)"
+
+# -----------------------------------------------------------------------------
+# Vi mode indicator — show NORMAL in right prompt
+# -----------------------------------------------------------------------------
+function zle-line-init zle-keymap-select {
+    RPS1="${${KEYMAP/vicmd/ NORMAL }/(main|viins)/  }"
+    RPS2=$RPS1
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
+
+# -----------------------------------------------------------------------------
+# Computer-specific overrides (~/.zshrc.local)
+# -----------------------------------------------------------------------------
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local

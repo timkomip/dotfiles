@@ -17,3 +17,11 @@ alias mr="mise run"
 alias m="mise"
 alias openpr="gh pr view --web"
 alias gcgui="EDITOR='cursor --wait' git commit"
+
+alias ctags="`brew --prefix`/bin/ctags"
+alias ghc="gh repo clone"
+alias yr="yarn run"
+alias pn="pnpm"
+alias rmrf="rm -rf"
+
+# claude

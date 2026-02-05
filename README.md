@@ -25,7 +25,7 @@ git clone <repo-url> ~/dotfiles
 ```
 
 This will:
-- Add the bootstrap script to your `~/.zshrc`
+- Symlink `config/zsh/zshrc` to `~/.zshrc`
 - Install Homebrew (if not already installed) - **macOS only**
 - Install packages from `config/Brewfile` (including `yq`) - **macOS only**
 - Create symlinks from `config/links.yml`
@@ -62,7 +62,6 @@ Show help message with available commands.
 dotfiles/
 ├── bin/
 │   └── dotty              # Main dotfiles management command
-├── bootstrap.sh           # Entry point for loading zsh config
 ├── config/
 │   ├── Brewfile           # Homebrew packages to install
 │   ├── links.yml          # Symlink definitions
@@ -74,6 +73,8 @@ dotfiles/
 │   │   ├── keybindings.json
 │   │   └── settings.json
 │   └── zsh/               # Zsh configuration files
+│       ├── zshrc          # Main zshrc (symlinked to ~/.zshrc)
+│       ├── ohmyzsh.zsh    # Oh My Zsh theme and plugins
 │       ├── aliases.sh     # Shell aliases
 │       ├── functions.sh   # Custom shell functions
 │       ├── fzf.sh         # FZF configuration (also loads fzf-git plugin)
@@ -87,17 +88,14 @@ dotfiles/
 
 ### Zsh Configuration
 
-The `bootstrap.sh` script loads configuration files from `config/zsh/` in this order:
-1. `ohmyzsh.zsh` - oh-my-zsh theme and plugins configuration
-2. `fzf.sh` - FZF environment variables and options (also loads fzf-git plugin)
-3. `paths.sh` - PATH modifications
+`config/zsh/zshrc` is symlinked to `~/.zshrc` and sources the following modules:
+1. `ohmyzsh.zsh` - Oh My Zsh theme and plugins (loaded before oh-my-zsh.sh)
+2. `paths.sh` - PATH modifications
+3. `fzf.sh` - FZF environment variables and options (also loads fzf-git plugin)
 4. `functions.sh` - Custom shell functions
 5. `aliases.sh` - Shell aliases
 
-You can extend the configuration by adding files to the `config_files` array in `bootstrap.sh`:
-```zsh
-config_files+=(custom.sh)
-```
+Machine-specific configuration (paths, aliases, SDK setups) goes in `~/.zshrc.local`, which is sourced at the end of zshrc if it exists. This file should not be committed to the repo.
 
 ### Symlinks
 

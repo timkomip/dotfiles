@@ -5,4 +5,6 @@ links:
     to: ~/.gitignore
   - from: ~/dotfiles/config/teleport.yaml
     to: ~/.teleport.yaml
+  - from: ~/dotfiles/config/zsh/zshrc
+    to: ~/.zshrc
 

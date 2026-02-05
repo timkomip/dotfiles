@@ -1,3 +1,5 @@
+source <(fzf --zsh)
+
 # ctrl-t - select file
 export FZF_CTRL_T_OPTS="
   --walker-skip .git,node_modules,target
