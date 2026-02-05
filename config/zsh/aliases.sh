@@ -25,3 +25,4 @@ alias pn="pnpm"
 alias rmrf="rm -rf"
 
 # claude
+alias clauded="claude --dangerously-skip-permissions"
