@@ -142,7 +142,7 @@ function sync_links() {
   fi
 
   # Parse YAML and create symlinks
-  local count=$(yq eval '.links | length' "$links_file")
+  local count=$(yq '.links | length' "$links_file")
   
   if [ "$count" -eq 0 ]; then
     echo "No links found in $links_file"
@@ -152,8 +152,8 @@ function sync_links() {
   echo "Creating symlinks from $links_file..."
 
   for ((i=0; i<count; i++)); do
-    local from=$(yq eval ".links[$i].from" "$links_file")
-    local to=$(yq eval ".links[$i].to" "$links_file")
+    local from=$(yq -r ".links[$i].from" "$links_file")
+    local to=$(yq -r ".links[$i].to" "$links_file")
 
     # Expand ~ to $HOME
     from="${from/#\~/$HOME}"

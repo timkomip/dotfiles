@@ -18,7 +18,9 @@ alias m="mise"
 alias openpr="gh pr view --web"
 alias gcgui="EDITOR='cursor --wait' git commit"
 
-alias ctags="`brew --prefix`/bin/ctags"
+if command -v brew &>/dev/null; then
+  alias ctags="$(brew --prefix)/bin/ctags"
+fi
 alias ghc="gh repo clone"
 alias yr="yarn run"
 alias pn="pnpm"

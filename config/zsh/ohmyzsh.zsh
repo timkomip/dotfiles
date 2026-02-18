@@ -5,25 +5,23 @@
 ZSH_THEME="robbyrussell"
 
 plugins=(
-  brew
-  bundler
   colored-man-pages
-  gem
   git
   node
   npm
-  rails
-  ruby
-  yarn
-  sfdx
-  iterm2
   gh
   vi-mode
-  gradle
-  vscode
-  zsh-autosuggestions
-  gcloud
   aliases
   mise
 )
+
+# macOS-only plugins
+if [[ "$OSTYPE" == darwin* ]]; then
+  plugins+=(brew iterm2)
+fi
+
+# plugins that require manual installation
+if [[ -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ]]; then
+  plugins+=(zsh-autosuggestions)
+fi
 

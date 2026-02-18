@@ -7,4 +7,3 @@ links:
     to: ~/.teleport.yaml
   - from: ~/dotfiles/config/zsh/zshrc
     to: ~/.zshrc
-

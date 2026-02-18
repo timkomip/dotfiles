@@ -1,4 +1,6 @@
-source <(fzf --zsh)
+if command -v fzf &>/dev/null && fzf --zsh &>/dev/null; then
+  source <(fzf --zsh)
+fi
 
 # ctrl-t - select file
 export FZF_CTRL_T_OPTS="
