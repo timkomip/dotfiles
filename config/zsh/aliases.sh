@@ -17,14 +17,12 @@ alias mr="mise run"
 alias m="mise"
 alias openpr="gh pr view --web"
 alias gcgui="EDITOR='cursor --wait' git commit"
-
-if command -v brew &>/dev/null; then
-  alias ctags="$(brew --prefix)/bin/ctags"
-fi
+alias mux=tmuxinator
 alias ghc="gh repo clone"
 alias yr="yarn run"
 alias pn="pnpm"
 alias rmrf="rm -rf"
-
-# claude
 alias clauded="claude --dangerously-skip-permissions"
+alias zj=zellij
+alias ea="v ~/dotfiles/config/zsh/aliases.sh"
+alias edf="v ~/dotfiles/"
