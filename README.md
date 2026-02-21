@@ -61,7 +61,8 @@ Show help message with available commands.
 ```
 dotfiles/
 ├── bin/
-│   └── dotty              # Main dotfiles management command
+│   ├── dotty              # Main dotfiles management command
+│   └── newalias           # Quickly add aliases to aliases.sh
 ├── config/
 │   ├── Brewfile           # Homebrew packages to install
 │   ├── links.yml          # Symlink definitions
@@ -143,6 +144,16 @@ places:
   code: /Users/timko/code
   tmp: /Users/timko/tmp
 ```
+
+### newalias
+
+Quickly add a new alias to `aliases.sh` without opening the file:
+```sh
+newalias gs "git status"
+# Appends: alias gs="git status"
+```
+
+Checks for duplicates and reminds you to reload your shell.
 
 ### Other Functions
 

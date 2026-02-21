@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# newalias - Quickly add a new alias to aliases.sh
+#
+# Usage: newalias <name> <command>
+# Example: newalias gs "git status"
+
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+ALIASES_FILE="$DOTFILES_DIR/config/zsh/aliases.sh"
+
+if [ "$#" -ne 2 ]; then
+  echo "Usage: newalias <name> <command>"
+  echo "Example: newalias gs \"git status\""
+  exit 1
+fi
+
+alias_name="$1"
+alias_command="$2"
+
+if [ ! -f "$ALIASES_FILE" ]; then
+  echo "Error: Aliases file not found at $ALIASES_FILE" >&2
+  exit 1
+fi
+
+if grep -q "^alias ${alias_name}=" "$ALIASES_FILE"; then
+  echo "Warning: alias '$alias_name' already exists in $ALIASES_FILE" >&2
+  grep "^alias ${alias_name}=" "$ALIASES_FILE"
+  exit 1
+fi
+
+echo "alias ${alias_name}=\"${alias_command}\"" >> "$ALIASES_FILE"
+echo "Added: alias ${alias_name}=\"${alias_command}\""
+echo "Reload your shell to use it: source ~/.zshrc (or r!)"
