@@ -7,3 +7,7 @@ links:
     to: ~/.teleport.yaml
   - from: ~/dotfiles/config/zsh/zshrc
     to: ~/.zshrc
+  - from: ~/dotfiles/config/tmux/tmux.conf
+    to: ~/.tmux.conf
+  - from: ~/dotfiles/config/zellij/config.kdl
+    to: ~/.config/zellij/config.kdl
