@@ -5,3 +5,4 @@ tags
 .timko
 .nvim.lua
 .lazy.lua
+.projectroot
