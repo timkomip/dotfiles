@@ -21,6 +21,7 @@ source "$ZSH_CONFIG_DIR/paths.sh"
 source "$ZSH_CONFIG_DIR/fzf.sh"
 source "$ZSH_CONFIG_DIR/functions.sh"
 source "$ZSH_CONFIG_DIR/aliases.sh"
+source "$ZSH_CONFIG_DIR/zsh-autosuggestions.zsh"
 
 # -----------------------------------------------------------------------------
 # Environment
