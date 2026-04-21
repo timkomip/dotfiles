@@ -13,6 +13,7 @@ plugins=(
   vi-mode
   aliases
   mise
+  zoxide
 )
 
 # macOS-only plugins
