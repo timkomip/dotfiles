@@ -9,15 +9,28 @@ function my-funcs() {
   echo "mkfile - create directory and file in one command"
 }
 
-# Display the cheatsheet documentation
+# Display cheatsheet documentation
+# Usage: cheatsheet [name]
+#   No args: show main cheatsheet (docs/cheatsheet.md)
+#   With arg: show docs/cheatsheets/{name}.md
 # Uses bat if available, otherwise falls back to less
 function cheatsheet() {
-  if command -v bat &>/dev/null; then
-    bat "$HOME"/dotfiles/docs/cheatsheet.md
+  local file
+  if [[ -n "$1" ]]; then
+    file="$HOME/dotfiles/docs/cheatsheets/$1.md"
+    if [[ ! -f "$file" ]]; then
+      echo "Cheatsheet not found: $1" >&2
+      return 1
+    fi
   else
-    less "$HOME"/dotfiles/docs/cheatsheet.md
+    file="$HOME/dotfiles/docs/cheatsheet.md"
   fi
 
+  if command -v bat &>/dev/null; then
+    bat "$file"
+  else
+    less "$file"
+  fi
 }
 
 # Navigate to a directory defined in ~/.teleport.json
