@@ -5,8 +5,9 @@ A dotfiles management system with automated setup and configuration.
 ## What This Repo Does
 
 This repository contains my personal dotfiles and a management tool (`dotty`) that automates:
-- Initializing dotfiles in your shell configuration
+- Installing Oh My Zsh
 - Installing Homebrew and required packages (macOS only)
+- Cloning vendor shell integrations
 - Creating symlinks for configuration files
 - Loading zsh configuration files in a structured way
 
@@ -25,9 +26,11 @@ git clone <repo-url> ~/dotfiles
 ```
 
 This will:
+- Install Oh My Zsh (if not already installed)
 - Symlink `config/zsh/zshrc` to `~/.zshrc`
 - Install Homebrew (if not already installed) - **macOS only**
 - Install packages from `config/Brewfile` (including `yq`) - **macOS only**
+- Clone vendor dependencies into `vendor/`
 - Create symlinks from `config/links.yml`
 
 3. Reload your shell:
@@ -40,7 +43,7 @@ source ~/.zshrc
 The `dotty` command provides several subcommands:
 
 ### `dotty init`
-Initialize everything: add bootstrap to zshrc, install brew packages, and create symlinks.
+Initialize everything: install Oh My Zsh, install brew packages, clone vendor dependencies, and create symlinks.
 
 ### `dotty brew`
 Install Homebrew (if needed) and install packages from `config/Brewfile`.  
@@ -69,7 +72,11 @@ dotfiles/
 │   ├── git/
 │   │   └── gitignore_global
 │   ├── ideavimrc          # IntelliJ IDEA Vim configuration
-│   ├── teleport.json      # Directory shortcuts for teleport function
+│   ├── teleport.yaml      # Directory shortcuts for teleport function
+│   ├── tmux/
+│   │   └── tmux.conf
+│   ├── zellij/
+│   │   └── config.kdl
 │   ├── vscode/
 │   │   ├── keybindings.json
 │   │   └── settings.json
@@ -79,9 +86,12 @@ dotfiles/
 │       ├── aliases.sh     # Shell aliases
 │       ├── functions.sh   # Custom shell functions
 │       ├── fzf.sh         # FZF configuration (also loads fzf-git plugin)
+│       ├── zsh-autosuggestions.zsh
 │       └── paths.sh       # PATH modifications
 └── docs/
-    ├── cheatsheet.md      # Quick reference
+    ├── cheatsheet.md      # Main quick reference
+    ├── cheatsheets/
+    │   └── zellij.md
     └── vscode.md          # VSCode notes
 ```
 
@@ -95,6 +105,15 @@ dotfiles/
 3. `fzf.sh` - FZF environment variables and options (also loads fzf-git plugin)
 4. `functions.sh` - Custom shell functions
 5. `aliases.sh` - Shell aliases
+6. `zsh-autosuggestions.zsh` - Zsh autosuggestions integration
+
+It also:
+- Loads Homebrew into PATH on Apple Silicon Macs
+- Sets `EDITOR=nvim`
+- Sources `~/.fzf.zsh` when present
+- Activates `mise` when available
+- Shows a `NORMAL` right-prompt indicator in vi mode
+- Prepends the hostname to the prompt when connected over SSH
 
 Machine-specific configuration (paths, aliases, SDK setups) goes in `~/.zshrc.local`, which is sourced at the end of zshrc if it exists. This file should not be committed to the repo.
 
@@ -107,6 +126,14 @@ links:
     to: ~/.ideavimrc
   - from: ~/dotfiles/config/git/gitignore_global
     to: ~/.gitignore
+  - from: ~/dotfiles/config/teleport.yaml
+    to: ~/.teleport.yaml
+  - from: ~/dotfiles/config/zsh/zshrc
+    to: ~/.zshrc
+  - from: ~/dotfiles/config/tmux/tmux.conf
+    to: ~/.tmux.conf
+  - from: ~/dotfiles/config/zellij/config.kdl
+    to: ~/.config/zellij/config.kdl
 ```
 
 Run `dotty links` to create all symlinks.
@@ -127,10 +154,6 @@ Navigate to directories from anywhere using shortcuts defined in `~/.teleport.js
 ```sh
 yaml_teleport code  # Navigate to ~/code
 yaml_teleport tmp   # Navigate to ~/tmp
-
-# Aliased as 't'
-t code
-t tmp
 ```
 
 **JSON version** (requires `jq`):
@@ -160,6 +183,8 @@ Checks for duplicates and reminds you to reload your shell.
 - `cheatsheet` - View the cheatsheet (aliased as `chtsht`)
 - `gcol` - Git checkout local branch (interactive with fzf)
 - `gcoi` - Git checkout interactive (includes remotes)
+- `edit-project` - Open a project from `~/code` with `$EDITOR`
+- `mkfile` - Create a directory and file in one command
 
 ## ZSH Plugins
 
@@ -167,9 +192,10 @@ Checks for duplicates and reminds you to reload your shell.
 
 Git integration for fzf. Install with:
 ```sh
-mkdir -p ~/.fzf
-git clone git@github.com:junegunn/fzf-git.sh.git ~/.fzf/fzf-git.sh
+~/dotfiles/bin/dotty init
 ```
+
+This clones `fzf-git.sh` into `~/dotfiles/vendor/fzf-git.sh`, where `config/zsh/fzf.sh` sources it if present.
 
 ### zsh-autosuggestions
 
