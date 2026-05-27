@@ -1,5 +1,6 @@
 .idea
 .vscode
+.zed
 projections.json
 tags
 .timko
@@ -7,3 +8,4 @@ tags
 .lazy.lua
 .projectroot
 code/constant.ai/cnxt/CLAUDE.md
+.cursor
