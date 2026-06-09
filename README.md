@@ -6,12 +6,12 @@ A dotfiles management system with automated setup and configuration.
 
 This repository contains my personal dotfiles and a management tool (`dotty`) that automates:
 - Installing Oh My Zsh
-- Installing Homebrew and required packages (macOS only)
+- Installing required packages (Homebrew on macOS, apt/snap on Ubuntu)
 - Cloning vendor shell integrations
 - Creating symlinks for configuration files
 - Loading zsh configuration files in a structured way
 
-> **Note:** Homebrew installation is only available on macOS. On other platforms, the brew-related commands will be skipped with a warning. Linux support may be added in the future.
+> **Note:** Package installation is OS-aware. On macOS it uses Homebrew and `config/Brewfile`. On Debian/Ubuntu it uses `apt` and `snap` (see `dotty packages`). Other platforms skip package installation with a warning.
 
 ## Quick Start
 
@@ -28,8 +28,9 @@ git clone <repo-url> ~/dotfiles
 This will:
 - Install Oh My Zsh (if not already installed)
 - Symlink `config/zsh/zshrc` to `~/.zshrc`
-- Install Homebrew (if not already installed) - **macOS only**
-- Install packages from `config/Brewfile` (including `yq`) - **macOS only**
+- Install packages (including `yq`):
+  - **macOS:** install Homebrew if needed, then packages from `config/Brewfile`
+  - **Ubuntu/Debian:** install packages via `apt` and `snap`
 - Clone vendor dependencies into `vendor/`
 - Create symlinks from `config/links.yml`
 
@@ -43,11 +44,18 @@ source ~/.zshrc
 The `dotty` command provides several subcommands:
 
 ### `dotty init`
-Initialize everything: install Oh My Zsh, install brew packages, clone vendor dependencies, and create symlinks.
+Initialize everything: install Oh My Zsh, install packages, clone vendor dependencies, and create symlinks.
+
+### `dotty packages`
+Install packages using the right package manager for the current OS:
+- **macOS:** Homebrew + `config/Brewfile` (same as `dotty brew`)
+- **Ubuntu/Debian:** `apt` for `git fzf htop bat jq`, `snap` for `yq gh lazygit`, and the official installer for `mise`
+
+On Linux, `/snap/bin` and `~/.local/bin` are added to `PATH` so freshly installed tools (like `yq`) are found by `dotty links`.
 
 ### `dotty brew`
 Install Homebrew (if needed) and install packages from `config/Brewfile`.  
-**Note:** This command only works on macOS. On other platforms, it will display a warning and skip brew operations.
+**Note:** This command only works on macOS. On other platforms it warns and skips. Use `dotty packages` for an OS-aware install.
 
 ### `dotty links`
 Create symlinks from `config/links.yml`. This command:

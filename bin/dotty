@@ -4,6 +4,25 @@ function is_macos() {
   [[ "$(uname)" == "Darwin" ]]
 }
 
+function is_linux() {
+  [[ "$(uname)" == "Linux" ]]
+}
+
+function has_apt() {
+  command -v apt-get &>/dev/null
+}
+
+# Ensure Linux install locations are on PATH for every subcommand. snap puts
+# binaries in /snap/bin and mise's installer uses ~/.local/bin; without these,
+# tools like yq won't be found by sync_links even right after installing them.
+function ensure_linux_path() {
+  is_linux || return 0
+  local dir
+  for dir in /snap/bin "$HOME/.local/bin"; do
+    [[ -d "$dir" && ":$PATH:" != *":$dir:"* ]] && export PATH="$PATH:$dir"
+  done
+}
+
 function show_help() {
   cat <<EOF
 dotty - Manage dotfiles
@@ -12,8 +31,9 @@ USAGE:
     dotty [COMMAND]
 
 COMMANDS:
-    init        Initialize dotfiles (zshrc, oh-my-zsh, brew, links)
-    brew        Install Homebrew and packages from Brewfile
+    init        Initialize dotfiles (zshrc, oh-my-zsh, packages, links)
+    packages    Install packages (Homebrew on macOS, apt/snap on Ubuntu)
+    brew        Install Homebrew and packages from Brewfile (macOS)
     links       Create symlinks from links.yml
     help        Show this help message
 
@@ -56,6 +76,85 @@ function init_brew() {
     brew bundle --file="$brewfile"
   else
     echo "Warning: Brewfile not found at $brewfile" >&2
+  fi
+}
+
+function init_apt() {
+  if ! has_apt; then
+    echo "Warning: apt-get not found. This Linux branch targets Debian/Ubuntu." >&2
+    return 0
+  fi
+
+  # Packages available directly from apt
+  local apt_packages=(git fzf htop bat jq)
+
+  echo "Updating apt package lists..."
+  sudo apt-get update
+
+  echo "Installing apt packages..."
+  local pkg
+  for pkg in "${apt_packages[@]}"; do
+    if sudo apt-get install -y "$pkg"; then
+      echo "  ✓ $pkg"
+    else
+      echo "  ⚠ Failed to install $pkg via apt" >&2
+    fi
+  done
+}
+
+function init_snap() {
+  if ! command -v snap &>/dev/null; then
+    echo "Warning: snap not available; skipping yq, gh, lazygit." >&2
+    echo "Install snapd (sudo apt-get install -y snapd) and re-run 'dotty packages'." >&2
+    return 0
+  fi
+
+  # apt's "yq" is a different (python) tool, so we use snap to get mikefarah's
+  # yq that the rest of dotty expects. gh and lazygit aren't in apt by default.
+  echo "Installing snap packages..."
+  local pkg
+  for pkg in yq gh lazygit; do
+    if sudo snap install "$pkg"; then
+      echo "  ✓ $pkg"
+    else
+      echo "  ⚠ Failed to install $pkg via snap" >&2
+    fi
+  done
+
+  # /snap/bin now exists; make sure freshly installed tools (e.g. yq) are found
+  ensure_linux_path
+}
+
+function init_mise() {
+  # mise isn't reliably packaged in apt or snap, so use its official installer.
+  if command -v mise &>/dev/null; then
+    echo "mise is already installed"
+    return 0
+  fi
+
+  echo "Installing mise..."
+  curl -fsSL https://mise.run | sh || echo "  ⚠ Failed to install mise" >&2
+}
+
+function init_linux_packages() {
+  if ! has_apt; then
+    echo "Warning: apt-get not found. This Linux branch targets Debian/Ubuntu." >&2
+    return 0
+  fi
+
+  init_apt
+  init_snap
+  init_mise
+}
+
+# Install packages using the right package manager for the current OS.
+function init_packages() {
+  if is_macos; then
+    init_brew
+  elif is_linux; then
+    init_linux_packages
+  else
+    echo "Warning: Unsupported OS '$(uname)'. Skipping package installation." >&2
   fi
 }
 
@@ -131,7 +230,7 @@ function sync_links() {
 
   # Check if yq is installed
   if ! command -v yq &>/dev/null; then
-    echo "Error: yq is required but not installed. Run 'dotty brew' first." >&2
+    echo "Error: yq is required but not installed. Run 'dotty packages' first." >&2
     exit 1
   fi
 
@@ -166,20 +265,23 @@ function sync_links() {
     fi
 
     # Check if destination already exists
-    if [ -e "$to" ]; then
+    if [ -e "$to" ] || [ -L "$to" ]; then
       if [ -L "$to" ]; then
         local current_target=$(readlink "$to")
         if [ "$current_target" = "$from" ]; then
           echo "  ✓ Symlink already exists: $to -> $from"
           continue
-        else
-          echo "  ⚠ Symlink exists but points elsewhere: $to -> $current_target"
-          continue
         fi
-      else
-        echo "  ⚠ File/directory already exists (not a symlink): $to"
-        continue
       fi
+
+      # Something is in the way (a real file, or a symlink pointing
+      # elsewhere). Don't destroy it: move it into a timestamped backup
+      # dir so it's recoverable, then fall through to create the symlink.
+      local backup_dir="$HOME/.dotfiles-backup/$DOTTY_RUN_STAMP"
+      mkdir -p "$backup_dir"
+      local backup_path="$backup_dir/$(basename "$to")"
+      mv "$to" "$backup_path"
+      echo "  ↻ Backed up existing $to -> $backup_path"
     fi
 
     # Create parent directory if needed
@@ -210,8 +312,8 @@ function init() {
   print_section "STEP 2: Install oh-my-zsh"
   init_ohmyzsh
   
-  print_section "STEP 3: Install Homebrew and Packages"
-  init_brew
+  print_section "STEP 3: Install Packages"
+  init_packages
   
   print_section "STEP 4: Clone Vendor Dependencies"
   init_vendor
@@ -223,9 +325,18 @@ function init() {
 }
 
 # Main command handler
+ensure_linux_path
+
+# One backup folder per invocation, shared by every link that needs to
+# displace an existing file (see sync_links).
+export DOTTY_RUN_STAMP="$(date +%Y%m%d-%H%M%S)"
+
 case "${1:-help}" in
   init)
     init
+    ;;
+  packages)
+    init_packages
     ;;
   brew)
     init_brew
