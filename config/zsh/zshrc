@@ -46,6 +46,9 @@ export EDITOR='nvim'
 if command -v mise &>/dev/null; then
   eval "$(mise activate zsh)"
 fi
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init zsh)"
+fi
 
 # -----------------------------------------------------------------------------
 # Vi mode indicator — show NORMAL in right prompt
