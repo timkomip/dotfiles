@@ -41,8 +41,20 @@ For more information, visit: ~/dotfiles
 EOF
 }
 
+# Print an overview of what `dotty init` is about to do. This is purely
+# informational; the actual work happens in the steps that follow.
 function init_dotfiles() {
-  echo "~/.zshrc will be symlinked to ~/dotfiles/config/zsh/zshrc via 'dotty links'"
+  local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
+  echo "Initializing dotfiles from: $dotfiles_dir"
+  echo ""
+  echo "init will:"
+  echo "  - install packages for this OS"
+  echo "  - install oh-my-zsh (if missing)"
+  echo "  - clone vendor dependencies into vendor/"
+  echo "  - create symlinks from config/links.yml"
+  echo ""
+  echo "Existing files in the way of a symlink are moved to"
+  echo "~/.dotfiles-backup/<timestamp>/ rather than overwritten."
 }
 
 function init_brew() {
