@@ -309,12 +309,12 @@ function init() {
   print_section "STEP 1: Initialize Dotfiles Configuration"
   init_dotfiles
   
-  print_section "STEP 2: Install oh-my-zsh"
-  init_ohmyzsh
-  
-  print_section "STEP 3: Install Packages"
+  print_section "STEP 2: Install Packages"
   init_packages
-  
+
+  print_section "STEP 3: Install oh-my-zsh"
+  init_ohmyzsh
+
   print_section "STEP 4: Clone Vendor Dependencies"
   init_vendor
   

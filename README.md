@@ -26,13 +26,12 @@ git clone <repo-url> ~/dotfiles
 ```
 
 This will:
-- Install Oh My Zsh (if not already installed)
-- Symlink `config/zsh/zshrc` to `~/.zshrc`
-- Install packages (including `yq`):
+- Install packages (including `yq` and `git`):
   - **macOS:** install Homebrew if needed, then packages from `config/Brewfile`
   - **Ubuntu/Debian:** install packages via `apt` and `snap`
+- Install Oh My Zsh (if not already installed; requires `git`, which is installed in the step above)
 - Clone vendor dependencies into `vendor/`
-- Create symlinks from `config/links.yml`
+- Create symlinks from `config/links.yml` (including `config/zsh/zshrc` to `~/.zshrc`)
 
 3. Reload your shell:
 ```sh
@@ -44,7 +43,7 @@ source ~/.zshrc
 The `dotty` command provides several subcommands:
 
 ### `dotty init`
-Initialize everything: install Oh My Zsh, install packages, clone vendor dependencies, and create symlinks.
+Initialize everything: install packages, install Oh My Zsh, clone vendor dependencies, and create symlinks. Packages are installed before Oh My Zsh so that `git` is available for the Oh My Zsh installer.
 
 ### `dotty packages`
 Install packages using the right package manager for the current OS:
