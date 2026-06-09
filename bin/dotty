@@ -33,7 +33,7 @@ USAGE:
 COMMANDS:
     init        Initialize dotfiles (zshrc, oh-my-zsh, packages, links)
     packages    Install packages (Homebrew on macOS, apt/snap on Ubuntu)
-    brew        Install Homebrew and packages from Brewfile (macOS)
+    brew        Install Homebrew and the mac_brew packages (macOS)
     links       Create symlinks from links.conf (--dry-run to preview)
     help        Show this help message
 
@@ -57,21 +57,22 @@ function init_dotfiles() {
   echo "~/.dotfiles-backup/<timestamp>/ rather than overwritten."
 }
 
+# Install Homebrew (if needed) and the brew packages from packages.conf. The
+# package list is selected by token (defaults to "mac_brew"; see packages.conf).
 function init_brew() {
+  local token="${1:-mac_brew}"
+
   if ! is_macos; then
     echo "Warning: Homebrew is only available on macOS. Skipping brew installation." >&2
     echo "Linux support may be added in the future." >&2
     return 0
   fi
 
-  local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
-  local brewfile="$dotfiles_dir/config/Brewfile"
-
   # Check if Homebrew is installed
   if ! command -v brew &>/dev/null; then
     echo "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    
+
     # Add Homebrew to PATH for Apple Silicon Macs
     if [[ -f "/opt/homebrew/bin/brew" ]]; then
       eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -82,51 +83,57 @@ function init_brew() {
     echo "Homebrew is already installed"
   fi
 
-  # Install packages from Brewfile
-  if [ -f "$brewfile" ]; then
-    echo "Installing packages from Brewfile..."
-    brew bundle --file="$brewfile"
-  else
-    echo "Warning: Brewfile not found at $brewfile" >&2
-  fi
+  echo "Installing brew packages..."
+  local entry args name
+  while IFS= read -r entry; do
+    [[ -z "$entry" ]] && continue
+    args=(${=entry}); name="${args[1]}"   # split "<package> [flags...]"
+    if brew install "${args[@]}"; then
+      echo "  ✓ $name"
+    else
+      echo "  ⚠ Failed to install $name via brew" >&2
+    fi
+  done < <(parse_packages "$token")
 }
 
+# Install the apt packages from packages.conf (token defaults to "apt").
 function init_apt() {
+  local token="${1:-apt}"
+
   if ! has_apt; then
     echo "Warning: apt-get not found. This Linux branch targets Debian/Ubuntu." >&2
     return 0
   fi
 
-  # Packages available directly from apt
-  local apt_packages=(git fzf htop bat jq)
+  # Each entry is "<package> [flags...]" (see parse_packages)
+  local apt_entries=("${(@f)$(parse_packages "$token")}")
+  if [[ ${#apt_entries[@]} -eq 0 ]]; then
+    echo "No apt packages listed in packages.conf."
+    return 0
+  fi
 
   echo "Updating apt package lists..."
   sudo apt-get update
 
   echo "Installing apt packages..."
-  local pkg
-  for pkg in "${apt_packages[@]}"; do
-    if sudo apt-get install -y "$pkg"; then
-      echo "  ✓ $pkg"
+  local entry args name
+  for entry in "${apt_entries[@]}"; do
+    [[ -z "$entry" ]] && continue
+    args=(${=entry}); name="${args[1]}"
+    if sudo apt-get install -y "${args[@]}"; then
+      echo "  ✓ $name"
     else
-      echo "  ⚠ Failed to install $pkg via apt" >&2
+      echo "  ⚠ Failed to install $name via apt" >&2
     fi
   done
-
-  # On Debian/Ubuntu the bat binary is installed as "batcat" to avoid a name
-  # clash. Expose it as "bat" in ~/.local/bin so configs and aliases that call
-  # "bat" work the same as on macOS (where Homebrew installs it as "bat").
-  if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
-    mkdir -p "$HOME/.local/bin"
-    ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
-    ensure_linux_path
-    echo "  ✓ linked bat -> batcat in ~/.local/bin"
-  fi
 }
 
+# Install the snap packages from packages.conf (token defaults to "snap").
 function init_snap() {
+  local token="${1:-snap}"
+
   if ! command -v snap &>/dev/null; then
-    echo "Warning: snap not available; skipping yq, gh, lazygit." >&2
+    echo "Warning: snap not available; skipping snap packages." >&2
     echo "Install snapd (sudo apt-get install -y snapd) and re-run 'dotty packages'." >&2
     return 0
   fi
@@ -134,50 +141,114 @@ function init_snap() {
   # apt's "yq" is a different (python) tool, so we use snap to get mikefarah's
   # yq that the rest of dotty expects. gh and lazygit aren't in apt by default.
   echo "Installing snap packages..."
-  local pkg
-  for pkg in yq gh lazygit; do
-    if sudo snap install "$pkg"; then
-      echo "  ✓ $pkg"
+  local entry args name
+  while IFS= read -r entry; do
+    [[ -z "$entry" ]] && continue
+    args=(${=entry}); name="${args[1]}"   # e.g. "nvim --classic"
+    if sudo snap install "${args[@]}"; then
+      echo "  ✓ $name"
     else
-      echo "  ⚠ Failed to install $pkg via snap" >&2
+      echo "  ⚠ Failed to install $name via snap" >&2
     fi
-  done
+  done < <(parse_packages "$token")
 
   # /snap/bin now exists; make sure freshly installed tools (e.g. yq) are found
   ensure_linux_path
 }
 
-function init_mise() {
-  # mise isn't reliably packaged in apt or snap, so use its official installer.
-  if command -v mise &>/dev/null; then
-    echo "mise is already installed"
-    return 0
+# Echo the install entries for an exact manager TOKEN (e.g. "apt" or "mac_brew")
+# from config/packages.conf, one per line. Each entry is the package name plus
+# any trailing flags/args to pass to the install command, e.g. "nvim --classic".
+# Parsed with shell built-ins (no yq), the same way sync_links reads links.conf.
+function parse_packages() {
+  local want="$1"
+  local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
+  local file="$dotfiles_dir/config/packages.conf"
+  if [ ! -f "$file" ]; then
+    echo "Warning: packages.conf not found at $file" >&2
+    return 1
   fi
 
-  echo "Installing mise..."
-  curl -fsSL https://mise.run | sh || echo "  ⚠ Failed to install mise" >&2
+  local line mgr rest trimmed
+  while IFS= read -r line; do
+    # Skip blank lines and comments (ignoring any leading whitespace)
+    trimmed="${line#"${line%%[![:space:]]*}"}"
+    [[ -z "$trimmed" || "$trimmed" == \#* ]] && continue
+
+    # First field is the manager; the rest is "<package> [flags...]"
+    read -r mgr rest <<< "$line"
+    [[ -z "$mgr" || -z "$rest" ]] && continue
+    [[ "$mgr" == "$want" ]] && echo "$rest"
+  done < "$file"
 }
 
-function init_linux_packages() {
-  if ! has_apt; then
-    echo "Warning: apt-get not found. This Linux branch targets Debian/Ubuntu." >&2
-    return 0
+# Echo each distinct manager token used in packages.conf, in first-seen order.
+function list_package_tokens() {
+  local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
+  local file="$dotfiles_dir/config/packages.conf"
+  if [ ! -f "$file" ]; then
+    echo "Warning: packages.conf not found at $file" >&2
+    return 1
   fi
 
-  init_apt
-  init_snap
-  init_mise
+  local line mgr pkg trimmed
+  typeset -A seen
+  while IFS= read -r line; do
+    trimmed="${line#"${line%%[![:space:]]*}"}"
+    [[ -z "$trimmed" || "$trimmed" == \#* ]] && continue
+
+    read -r mgr pkg <<< "$line"
+    [[ -z "$mgr" || -z "$pkg" || -n "${seen[$mgr]}" ]] && continue
+    seen[$mgr]=1
+    echo "$mgr"
+  done < "$file"
 }
 
-# Install packages using the right package manager for the current OS.
-function init_packages() {
+# Echo "mac" or "linux" for the current OS (empty for anything else).
+function current_os_tag() {
   if is_macos; then
-    init_brew
+    echo mac
   elif is_linux; then
-    init_linux_packages
-  else
-    echo "Warning: Unsupported OS '$(uname)'. Skipping package installation." >&2
+    echo linux
   fi
+}
+
+# Install every package in config/packages.conf, then run custom-installs.zsh.
+#
+# Each line's manager token may carry an optional OS prefix:
+#   mac_<mgr>/linux_<mgr> run only on that OS; bare <mgr> runs wherever the
+#   manager's command is available (each init_* keeps its own availability
+#   guard). Tools not in a package manager live in config/custom-installs.zsh.
+function init_packages() {
+  local os_tag
+  os_tag="$(current_os_tag)"
+
+  local token mgr os
+  for token in ${(@f)"$(list_package_tokens)"}; do
+    mgr="$token"
+    os=""
+    if [[ "$token" == (mac|linux)_* ]]; then
+      os="${token%%_*}"
+      mgr="${token#*_}"
+      if [[ "$os" != "$os_tag" ]]; then
+        echo "Skipping $token (only on $os)"
+        continue
+      fi
+    fi
+
+    case "$mgr" in
+      brew) init_brew "$token" ;;
+      apt)  init_apt  "$token" ;;
+      snap) init_snap "$token" ;;
+      *)    echo "Warning: unknown package manager '$mgr' in packages.conf" >&2 ;;
+    esac
+  done
+
+  # Tools not in a package manager (mise, bat shim). Runs on every OS; each
+  # function in custom-installs.zsh does its own platform check.
+  local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
+  [ -f "$dotfiles_dir/config/custom-installs.zsh" ] && source "$dotfiles_dir/config/custom-installs.zsh"
+  typeset -f custom_installs >/dev/null && custom_installs
 }
 
 function init_ohmyzsh() {

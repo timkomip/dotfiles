@@ -11,7 +11,7 @@ This repository contains my personal dotfiles and a management tool (`dotty`) th
 - Creating symlinks for configuration files
 - Loading zsh configuration files in a structured way
 
-> **Note:** Package installation is OS-aware. On macOS it uses Homebrew and `config/Brewfile`. On Debian/Ubuntu it uses `apt` and `snap` (see `dotty packages`). Other platforms skip package installation with a warning.
+> **Note:** Package installation is driven by `config/packages.conf` and is OS-aware. On macOS it uses Homebrew; on Debian/Ubuntu it uses `apt` and `snap` (see `dotty packages`). Other platforms skip package installation with a warning.
 
 ## Quick Start
 
@@ -26,9 +26,9 @@ git clone <repo-url> ~/dotfiles
 ```
 
 This will:
-- Install packages (including `yq` and `git`):
-  - **macOS:** install Homebrew if needed, then packages from `config/Brewfile`
-  - **Ubuntu/Debian:** install packages via `apt` and `snap`
+- Install packages (including `yq` and `git`) from `config/packages.conf`:
+  - **macOS:** install Homebrew if needed, then the `mac_brew` packages
+  - **Ubuntu/Debian:** install the `apt` and `snap` packages
 - Install Oh My Zsh (if not already installed; requires `git`, which is installed in the step above)
 - Clone vendor dependencies into `vendor/`
 - Create symlinks from `config/links.conf` (including `config/zsh/zshrc` to `~/.zshrc`)
@@ -46,14 +46,19 @@ The `dotty` command provides several subcommands:
 Initialize everything: install packages, install Oh My Zsh, clone vendor dependencies, and create symlinks. Packages are installed before Oh My Zsh so that `git` is available for the Oh My Zsh installer.
 
 ### `dotty packages`
-Install packages using the right package manager for the current OS:
-- **macOS:** Homebrew + `config/Brewfile` (same as `dotty brew`)
-- **Ubuntu/Debian:** `apt` for `git fzf htop bat jq`, `snap` for `yq gh lazygit`, and the official installer for `mise`. On Debian/Ubuntu `bat` installs its binary as `batcat`, so a `bat -> batcat` symlink is created in `~/.local/bin` to match macOS.
+Install everything declared in `config/packages.conf` (plus the extra installs in `config/custom-installs.zsh`). Each line in `packages.conf` is `<manager> <package>`; the manager token decides where it runs:
+- **`mac_brew`** packages install via Homebrew, macOS only.
+- **`apt`** and **`snap`** packages install wherever that command is available (Debian/Ubuntu).
+
+After the package managers run, `config/custom-installs.zsh` handles tools that aren't in a package manager:
+- `mise` — installed via its official installer on Linux (macOS gets it from Homebrew).
+- `zoxide` — installed via its official installer on Linux (macOS gets it from Homebrew).
+- the `bat -> batcat` shim — on Debian/Ubuntu `bat` installs its binary as `batcat`, so a `bat -> batcat` symlink is created in `~/.local/bin` to match macOS.
 
 On Linux, `/snap/bin` and `~/.local/bin` are added to `PATH` so freshly installed tools (like `mise`, the `bat` shim, and `yq`) are found within the same `dotty` run.
 
 ### `dotty brew`
-Install Homebrew (if needed) and install packages from `config/Brewfile`.  
+Install Homebrew (if needed) and install the `mac_brew` packages from `config/packages.conf`.  
 **Note:** This command only works on macOS. On other platforms it warns and skips. Use `dotty packages` for an OS-aware install.
 
 ### `dotty links`
@@ -79,7 +84,8 @@ dotfiles/
 │   ├── dotty              # Main dotfiles management command
 │   └── newalias           # Quickly add aliases to aliases.sh
 ├── config/
-│   ├── Brewfile           # Homebrew packages to install
+│   ├── packages.conf      # Package list (<manager> <package>, OS-aware)
+│   ├── custom-installs.zsh # Installs for tools not in a package manager
 │   ├── links.conf         # Symlink definitions (plain two-column file)
 │   ├── git/
 │   │   └── gitignore_global
@@ -124,10 +130,39 @@ It also:
 - Sets `EDITOR=nvim`
 - Sources `~/.fzf.zsh` when present
 - Activates `mise` when available
+- Activates `zoxide` when available
 - Shows a `NORMAL` right-prompt indicator in vi mode
 - Prepends the hostname to the prompt when connected over SSH
 
 Machine-specific configuration (paths, aliases, SDK setups) goes in `~/.zshrc.local`, which is sourced at the end of zshrc if it exists. This file should not be committed to the repo.
+
+### Packages
+
+Packages are defined in `config/packages.conf`, a plain file with the format
+`<manager> <package> [flags...]`. Blank lines and lines starting with `#` are
+ignored. The manager token in the first column controls where each package
+installs:
+
+```
+# <manager>  <package>   [flags...]
+mac_brew      neovim                 # brew, macOS only
+apt           git                    # apt, wherever apt-get exists
+snap          nvim         --classic # snap install nvim --classic
+```
+
+- A `mac_` / `linux_` prefix scopes the line to that OS (e.g. `mac_brew` makes
+  the macOS-only intent explicit, since Homebrew can also exist on Linux).
+- A bare token (`apt`, `snap`) runs wherever that manager's command is
+  available, regardless of OS.
+- Anything after the package name is passed straight through to the install
+  command, so flags like `snap`'s `--classic` (needed for `nvim`) or `brew`'s
+  `--HEAD` just work.
+
+Like `links.conf`, this file is parsed with shell built-ins, so `dotty
+packages` needs no external tools. Tools that aren't in a package manager
+(currently `mise`, `zoxide`, and the `bat -> batcat` shim) live in
+`config/custom-installs.zsh`, which `dotty` sources and runs on every OS — each
+install function there does its own platform check.
 
 ### Symlinks
 
