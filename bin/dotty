@@ -112,6 +112,16 @@ function init_apt() {
       echo "  ⚠ Failed to install $pkg via apt" >&2
     fi
   done
+
+  # On Debian/Ubuntu the bat binary is installed as "batcat" to avoid a name
+  # clash. Expose it as "bat" in ~/.local/bin so configs and aliases that call
+  # "bat" work the same as on macOS (where Homebrew installs it as "bat").
+  if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
+    ensure_linux_path
+    echo "  ✓ linked bat -> batcat in ~/.local/bin"
+  fi
 }
 
 function init_snap() {

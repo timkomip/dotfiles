@@ -48,7 +48,7 @@ Initialize everything: install packages, install Oh My Zsh, clone vendor depende
 ### `dotty packages`
 Install packages using the right package manager for the current OS:
 - **macOS:** Homebrew + `config/Brewfile` (same as `dotty brew`)
-- **Ubuntu/Debian:** `apt` for `git fzf htop bat jq`, `snap` for `yq gh lazygit`, and the official installer for `mise`
+- **Ubuntu/Debian:** `apt` for `git fzf htop bat jq`, `snap` for `yq gh lazygit`, and the official installer for `mise`. On Debian/Ubuntu `bat` installs its binary as `batcat`, so a `bat -> batcat` symlink is created in `~/.local/bin` to match macOS.
 
 On Linux, `/snap/bin` and `~/.local/bin` are added to `PATH` so freshly installed tools (like `yq`) are found by `dotty links`.
 
