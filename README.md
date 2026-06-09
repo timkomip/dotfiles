@@ -31,7 +31,7 @@ This will:
   - **Ubuntu/Debian:** install packages via `apt` and `snap`
 - Install Oh My Zsh (if not already installed; requires `git`, which is installed in the step above)
 - Clone vendor dependencies into `vendor/`
-- Create symlinks from `config/links.yml` (including `config/zsh/zshrc` to `~/.zshrc`)
+- Create symlinks from `config/links.conf` (including `config/zsh/zshrc` to `~/.zshrc`)
 
 3. Reload your shell:
 ```sh
@@ -50,18 +50,23 @@ Install packages using the right package manager for the current OS:
 - **macOS:** Homebrew + `config/Brewfile` (same as `dotty brew`)
 - **Ubuntu/Debian:** `apt` for `git fzf htop bat jq`, `snap` for `yq gh lazygit`, and the official installer for `mise`. On Debian/Ubuntu `bat` installs its binary as `batcat`, so a `bat -> batcat` symlink is created in `~/.local/bin` to match macOS.
 
-On Linux, `/snap/bin` and `~/.local/bin` are added to `PATH` so freshly installed tools (like `yq`) are found by `dotty links`.
+On Linux, `/snap/bin` and `~/.local/bin` are added to `PATH` so freshly installed tools (like `mise`, the `bat` shim, and `yq`) are found within the same `dotty` run.
 
 ### `dotty brew`
 Install Homebrew (if needed) and install packages from `config/Brewfile`.  
 **Note:** This command only works on macOS. On other platforms it warns and skips. Use `dotty packages` for an OS-aware install.
 
 ### `dotty links`
-Create symlinks from `config/links.yml`. This command:
-- Parses the YAML file using `yq`
+Create symlinks from `config/links.conf`. This command:
+- Parses the plain-text config with shell built-ins (no `yq` or other dependency)
 - Creates symlinks if they don't already exist
 - Skips existing symlinks that point to the correct location
-- Warns about conflicts
+- Backs up anything else in the way to `~/.dotfiles-backup/<timestamp>/`
+
+Pass `--dry-run` (or `-n`) to preview what would happen without changing anything:
+```sh
+dotty links --dry-run
+```
 
 ### `dotty help`
 Show help message with available commands.
@@ -75,7 +80,7 @@ dotfiles/
 │   └── newalias           # Quickly add aliases to aliases.sh
 ├── config/
 │   ├── Brewfile           # Homebrew packages to install
-│   ├── links.yml          # Symlink definitions
+│   ├── links.conf         # Symlink definitions (plain two-column file)
 │   ├── git/
 │   │   └── gitignore_global
 │   ├── ideavimrc          # IntelliJ IDEA Vim configuration
@@ -126,27 +131,30 @@ Machine-specific configuration (paths, aliases, SDK setups) goes in `~/.zshrc.lo
 
 ### Symlinks
 
-Symlinks are defined in `config/links.yml`:
-```yaml
-links:
-  - from: ~/dotfiles/config/ideavimrc
-    to: ~/.ideavimrc
-  - from: ~/dotfiles/config/git/gitignore_global
-    to: ~/.gitignore
-  - from: ~/dotfiles/config/teleport.yaml
-    to: ~/.teleport.yaml
-  - from: ~/dotfiles/config/zsh/zshrc
-    to: ~/.zshrc
-  - from: ~/dotfiles/config/tmux/tmux.conf
-    to: ~/.tmux.conf
-  - from: ~/dotfiles/config/zellij/config.kdl
-    to: ~/.config/zellij/config.kdl
+Symlinks are defined in `config/links.conf`, a plain two-column file
+(`<source> <destination>`). The source is relative to the repo root; a
+leading `~` in the destination expands to `$HOME`. Blank lines and lines
+starting with `#` are ignored.
+
+```
+# <source>                    <destination>
+config/ideavimrc              ~/.ideavimrc
+config/git/gitignore_global   ~/.gitignore
+config/teleport.yaml          ~/.teleport.yaml
+config/zsh/zshrc              ~/.zshrc
+config/tmux/tmux.conf         ~/.tmux.conf
+config/zellij/config.kdl      ~/.config/zellij/config.kdl
 ```
 
-Run `dotty links` to create all symlinks.
+Columns are split on whitespace, so the alignment is cosmetic — one space
+works just as well. This format is parsed with shell built-ins, so `dotty
+links` needs no external tools (it no longer depends on `yq`).
+
+Run `dotty links` to create all symlinks, or `dotty links --dry-run` to
+preview them first.
 
 > **Note:**  
-> This command only *creates* links as defined in `config/links.yml`.  
+> This command only *creates* links as defined in `config/links.conf`.  
 > It does **not** remove previously created links.  
 > In the future, a lock file might be added to handle link removal.
 

@@ -34,7 +34,7 @@ COMMANDS:
     init        Initialize dotfiles (zshrc, oh-my-zsh, packages, links)
     packages    Install packages (Homebrew on macOS, apt/snap on Ubuntu)
     brew        Install Homebrew and packages from Brewfile (macOS)
-    links       Create symlinks from links.yml
+    links       Create symlinks from links.conf (--dry-run to preview)
     help        Show this help message
 
 For more information, visit: ~/dotfiles
@@ -51,7 +51,7 @@ function init_dotfiles() {
   echo "  - install packages for this OS"
   echo "  - install oh-my-zsh (if missing)"
   echo "  - clone vendor dependencies into vendor/"
-  echo "  - create symlinks from config/links.yml"
+  echo "  - create symlinks from config/links.conf"
   echo ""
   echo "Existing files in the way of a symlink are moved to"
   echo "~/.dotfiles-backup/<timestamp>/ rather than overwritten."
@@ -246,39 +246,48 @@ function init_vendor() {
   git_clone_vendor "https://github.com/junegunn/fzf-git.sh" "fzf-git.sh"
 }
 
+# Create symlinks defined in config/links.conf. Pass --dry-run (or -n) to
+# print what would happen without touching the filesystem. The config is a
+# plain two-column file (<source> <destination>); see config/links.conf.
+# Using a flat file keeps sync_links dependency-free (no yq).
 function sync_links() {
+  local dry_run=0
+  local arg
+  for arg in "$@"; do
+    case "$arg" in
+      --dry-run|-n) dry_run=1 ;;
+    esac
+  done
+
   local dotfiles_dir="${DOTFILES_DIR:-$HOME/dotfiles}"
-  local links_file="$dotfiles_dir/config/links.yml"
+  local links_file="$dotfiles_dir/config/links.conf"
 
-  # Check if yq is installed
-  if ! command -v yq &>/dev/null; then
-    echo "Error: yq is required but not installed. Run 'dotty packages' first." >&2
-    exit 1
-  fi
-
-  # Check if links.yml exists
+  # Check if links.conf exists
   if [ ! -f "$links_file" ]; then
-    echo "Warning: links.yml not found at $links_file" >&2
+    echo "Warning: links.conf not found at $links_file" >&2
     return 1
   fi
 
-  # Parse YAML and create symlinks. yq returns "null" (not 0) when there's no
-  # links key, so guard against a non-numeric count before comparing it.
-  local count=$(yq '.links | length' "$links_file")
-
-  if ! [[ "$count" =~ ^[0-9]+$ ]] || [ "$count" -eq 0 ]; then
-    echo "No links found in $links_file"
-    return 0
+  if [ "$dry_run" -eq 1 ]; then
+    echo "Dry run: no files will be created, moved, or deleted."
   fi
-
   echo "Creating symlinks from $links_file..."
 
-  for ((i=0; i<count; i++)); do
-    local from=$(yq -r ".links[$i].from" "$links_file")
-    local to=$(yq -r ".links[$i].to" "$links_file")
+  local line from to trimmed
+  while IFS= read -r line; do
+    # Skip blank lines and comments (ignoring any leading whitespace)
+    trimmed="${line#"${line%%[![:space:]]*}"}"
+    [[ -z "$trimmed" || "$trimmed" == \#* ]] && continue
 
-    # Expand ~ to $HOME
-    from="${from/#\~/$HOME}"
+    # Split the line into two whitespace-separated fields
+    read -r from to <<< "$line"
+    if [[ -z "$from" || -z "$to" ]]; then
+      echo "  ⚠ Skipping malformed line: $line" >&2
+      continue
+    fi
+
+    # Source is relative to the repo root; destination may use a leading ~
+    from="$dotfiles_dir/$from"
     to="${to/#\~/$HOME}"
 
     # Check if source exists
@@ -301,10 +310,19 @@ function sync_links() {
       # elsewhere). Don't destroy it: move it into a timestamped backup
       # dir so it's recoverable, then fall through to create the symlink.
       local backup_dir="$HOME/.dotfiles-backup/$DOTTY_RUN_STAMP"
-      mkdir -p "$backup_dir"
       local backup_path="$backup_dir/$(basename "$to")"
-      mv "$to" "$backup_path"
-      echo "  ↻ Backed up existing $to -> $backup_path"
+      if [ "$dry_run" -eq 1 ]; then
+        echo "  ↻ [dry-run] would back up existing $to -> $backup_path"
+      else
+        mkdir -p "$backup_dir"
+        mv "$to" "$backup_path"
+        echo "  ↻ Backed up existing $to -> $backup_path"
+      fi
+    fi
+
+    if [ "$dry_run" -eq 1 ]; then
+      echo "  ✓ [dry-run] would create symlink: $to -> $from"
+      continue
     fi
 
     # Create parent directory if needed
@@ -316,7 +334,7 @@ function sync_links() {
     # Create symlink
     ln -s "$from" "$to"
     echo "  ✓ Created symlink: $to -> $from"
-  done
+  done < "$links_file"
 }
 
 function print_section() {
@@ -365,7 +383,7 @@ case "${1:-help}" in
     init_brew
     ;;
   links)
-    sync_links
+    sync_links "${@:2}"
     ;;
   help|--help|-h)
     show_help
