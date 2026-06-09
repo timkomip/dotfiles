@@ -262,10 +262,11 @@ function sync_links() {
     return 1
   fi
 
-  # Parse YAML and create symlinks
+  # Parse YAML and create symlinks. yq returns "null" (not 0) when there's no
+  # links key, so guard against a non-numeric count before comparing it.
   local count=$(yq '.links | length' "$links_file")
-  
-  if [ "$count" -eq 0 ]; then
+
+  if ! [[ "$count" =~ ^[0-9]+$ ]] || [ "$count" -eq 0 ]; then
     echo "No links found in $links_file"
     return 0
   fi
