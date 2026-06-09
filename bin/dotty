@@ -234,7 +234,7 @@ function git_clone_vendor() {
 
   # Clone the repository
   echo "Cloning $dir_name into vendor directory..."
-  if git clone "$repo_url" "$repo_dir" 2>/dev/null; then
+  if git clone "$repo_url" "$repo_dir"; then
     echo "✓ $dir_name cloned successfully"
   else
     echo "Warning: Failed to clone $dir_name" >&2
