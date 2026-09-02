@@ -7,6 +7,7 @@ function my-funcs() {
   echo "gcoi - git checkout interactive (fzf with remotes)"
   echo "edit-project - interactive open in editor (assume ~/code, uses \$EDITOR)"
   echo "mkfile - create directory and file in one command"
+  echo "caplog - run a command with color, mirror output to ./dev.log"
 }
 
 # Display cheatsheet documentation
@@ -189,4 +190,22 @@ function mkfile() {
   local safe_filename=$(basename "$filename")
 
   mkdir -p -- "$dir_path" && touch -- "$dir_path"/"$safe_filename"
+}
+
+# Run a command with color forced and mirror its output to a log file
+# Usage: caplog <command> [args...]
+#   - Forces color (FORCE_COLOR=1) even though output is piped through tee
+#   - Streams to your terminal AND a dev.log file in the current directory
+#   - Log path: ./dev.log (add to .gitignore so it isn't committed)
+#   - View the saved file with color via: less -R dev.log
+# Example: caplog bun dev
+function caplog() {
+  if [ -z "$1" ]; then
+    echo "Usage: caplog <command> [args...]" >&2
+    return 1
+  fi
+
+  local log="dev.log"
+  FORCE_COLOR=1 "$@" 2>&1 | tee "$log"
+  print -u2 "↳ logged to $PWD/$log"
 }

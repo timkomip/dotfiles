@@ -235,6 +235,7 @@ Checks for duplicates and reminds you to reload your shell.
 - `gcoi` - Git checkout interactive (includes remotes)
 - `edit-project` - Open a project from `~/code` with `$EDITOR`
 - `mkfile` - Create a directory and file in one command
+- `caplog` - Run a command with color, mirroring output to `./dev.log` in the current dir (e.g. `caplog bun dev`)
 
 ## ZSH Plugins
 
