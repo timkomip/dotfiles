@@ -9,3 +9,7 @@ tags
 .projectroot
 code/constant.ai/cnxt/CLAUDE.md
 .cursor
+mise.toml
+.scratch
+CLAUDE.local.md
+**/.claude/settings.local.json
