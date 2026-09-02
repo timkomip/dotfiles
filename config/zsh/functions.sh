@@ -8,6 +8,7 @@ function my-funcs() {
   echo "edit-project - interactive open in editor (assume ~/code, uses \$EDITOR)"
   echo "mkfile - create directory and file in one command"
   echo "caplog - run a command with color, mirror output to ./dev.log"
+  echo "wt - jump to a git worktree of the current repo (fzf)"
 }
 
 # Display cheatsheet documentation
@@ -208,4 +209,61 @@ function caplog() {
   local log="dev.log"
   FORCE_COLOR=1 "$@" 2>&1 | tee "$log"
   print -u2 "↳ logged to $PWD/$log"
+}
+
+# Jump to a worktree of the current repo (fzf)
+# Usage: wt [filter]
+#   - No args: fzf-pick from all worktrees of this repo
+#   - With arg: cd straight in if exactly one worktree matches, else pre-filter
+#   - Shows: current-marker, branch (or (detached)), short sha, ~-shortened path
+#   - Matching runs against branch, sha, and path
+#   - Says so and exits if the repo has only the main worktree
+# Example: wt fix
+function wt() {
+  local here rows sel
+  here=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    echo "wt: not inside a git repo" >&2
+    return 1
+  }
+
+  rows=$(git worktree list --porcelain | awk -v home="$HOME" -v here="$here" '
+    function flush(   disp) {
+      if (path == "") return
+      n++
+      disp = path
+      if (index(disp, home) == 1) disp = "~" substr(disp, length(home) + 1)
+      mark[n]   = (path == here ? "*" : " ")
+      branch[n] = (br == "" ? "(detached)" : br)
+      sha[n]    = substr(head, 1, 7)
+      shown[n]  = disp
+      raw[n]    = path
+      if (length(branch[n]) > w) w = length(branch[n])
+      path = ""; br = ""; head = ""
+    }
+    /^worktree /{ flush(); path = substr($0, 10) }
+    /^HEAD /    { head = $2 }
+    /^branch /  { br = $2; sub("refs/heads/", "", br) }
+    END {
+      flush()
+      for (i = 1; i <= n; i++) {
+        pad = branch[i]
+        while (length(pad) < w) pad = pad " "
+        printf "\033[33m%s\033[0m \033[36m%s\033[0m  \033[2m%s\033[0m  %s\t%s\n", \
+          mark[i], pad, sha[i], shown[i], raw[i]
+      }
+    }
+  ')
+
+  if [[ $(printf '%s\n' "$rows" | grep -c .) -le 1 ]]; then
+    echo "wt: only the main worktree here — add one with: git worktree add <path> <branch>" >&2
+    return 0
+  fi
+
+  sel=$(printf '%s\n' "$rows" | fzf --ansi --no-multi \
+    --delimiter=$'\t' --with-nth=1 \
+    --query="$1" --select-1 --exit-0 \
+    --header='worktrees — * = current')
+
+  [[ -z "$sel" ]] && return 0
+  cd "${sel##*$'\t'}"
 }

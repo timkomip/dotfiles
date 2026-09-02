@@ -236,6 +236,7 @@ Checks for duplicates and reminds you to reload your shell.
 - `edit-project` - Open a project from `~/code` with `$EDITOR`
 - `mkfile` - Create a directory and file in one command
 - `caplog` - Run a command with color, mirroring output to `./dev.log` in the current dir (e.g. `caplog bun dev`)
+- `wt` - Jump to a git worktree of the current repo with fzf, showing branch, short sha, and path (e.g. `wt fix` cds straight in when only one matches)
 
 ## ZSH Plugins
 
